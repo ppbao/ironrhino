@@ -30,9 +30,10 @@ public class BaseTreeControl<T extends BaseTreeableEntity<T>> {
 		entityClass = clazz;
 	}
 
+	@SuppressWarnings("unchecked")
 	public synchronized void buildTree() {
 		entityManager.setEntityClass(entityClass);
-		tree = entityManager.loadTree();
+		tree = (T) entityManager.loadTree();
 	}
 
 	public T getTree() {
