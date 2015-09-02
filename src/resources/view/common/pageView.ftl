@@ -17,6 +17,9 @@ div.section{
 	padding: 10px;
 	margin-bottom: 20px;
 }
+div.section ul{
+	margin: 0;
+}
 </style>
 <script src="<@url value="/assets/components/flot/jquery.flot.js"/>" type="text/javascript"></script>
 <script src="<@url value="/assets/components/flot/jquery.flot.time.js"/>" type="text/javascript"></script>
