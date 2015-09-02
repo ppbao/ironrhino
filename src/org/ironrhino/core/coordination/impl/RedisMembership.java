@@ -68,7 +68,7 @@ public class RedisMembership implements Membership {
 						String url = new StringBuilder("http://")
 								.append(member.substring(member
 										.lastIndexOf('@') + 1))
-								.append("/_ping").toString();
+								.append("/_ping?_internal_testing_").toString();
 						try {
 							HttpURLConnection conn = (HttpURLConnection) new URL(
 									url).openConnection();
