@@ -2,7 +2,22 @@
 <#escape x as x?html><html>
 <head>
 <title>${action.getText('pageView')}</title>
-<!--[if lte IE 8]><script language="javascript" type="text/javascript" src="<@url value="/assets/components/flot/excanvas.min.js"/>"></script><![endif]-->
+<style>
+form.form-inline{
+	margin-bottom: 0;
+}
+.row-fluid strong{
+	font-size: 18px;
+}
+div.section{
+	border: 1px solid #DEDEDE;
+    border-radius: 5px;
+    margin: 10px 4px;
+    box-shadow: 0 0 10px rgba(189, 189, 189, 0.4);
+	padding: 10px;
+	margin-bottom: 20px;
+}
+</style>
 <script src="<@url value="/assets/components/flot/jquery.flot.js"/>" type="text/javascript"></script>
 <script src="<@url value="/assets/components/flot/jquery.flot.time.js"/>" type="text/javascript"></script>
 <script src="<@url value="/assets/components/flot/jquery.flot.pie.js"/>" type="text/javascript"></script>
@@ -59,7 +74,8 @@ Initialization.pageView = function() {
 </div>
 </#if>
 
-<div class="row">
+<div class="section pv">
+<div class="row-fluid">
 <div class="span2 offset2">
 <strong>${action.getText('pv')}</strong>
 </div>
@@ -89,8 +105,10 @@ Initialization.pageView = function() {
 </#if>
 <div class="ajaxpanel" data-url="${dataurl}"></div>
 </div>
+</div>
 
-<div class="row" style="padding-top:20px;">
+<div class="section uip">
+<div class="row-fluid">
 <div class="span2 offset2">
 <strong>${action.getText('uip')}</strong>
 </div>
@@ -112,9 +130,10 @@ Initialization.pageView = function() {
 </#if>
 <div class="ajaxpanel" data-url="${dataurl}"></div>
 </div>
+</div>
 
-
-<div class="row" style="padding-top:20px;">
+<div class="section usid">
+<div class="row-fluid">
 <div class="span2 offset2">
 <strong>${action.getText('usid')}</strong>
 </div>
@@ -136,8 +155,10 @@ Initialization.pageView = function() {
 </#if>
 <div class="ajaxpanel" data-url="${dataurl}"></div>
 </div>
+</div>
 
-<div class="row" style="padding-top:20px;">
+<div class="section uu">
+<div class="row-fluid">
 <div class="span2 offset2">
 <strong>${action.getText('uu')}</strong>
 </div>
@@ -159,9 +180,10 @@ Initialization.pageView = function() {
 </#if>
 <div class="ajaxpanel" data-url="${dataurl}"></div>
 </div>
+</div>
 
-
-<div class="row" style="padding-top:20px;">
+<div class="section url">
+<div class="row-fluid">
 <div class="span2 offset2">
 <strong>${action.getText('url')}</strong>
 </div>
@@ -188,8 +210,10 @@ Initialization.pageView = function() {
 </#if>
 <div class="ajaxpanel" data-url="${dataurl}"></div>
 </div>
+</div>
 
-<div class="row" style="padding-top:20px;">
+<div class="section fr">
+<div class="row-fluid">
 <div class="span2 offset2">
 <strong>${action.getText('fr')}</strong>
 </div>
@@ -216,8 +240,10 @@ Initialization.pageView = function() {
 </#if>
 <div class="ajaxpanel" data-url="${dataurl}"></div>
 </div>
+</div>
 
-<div class="row" style="padding-top:20px;">
+<div class="section province">
+<div class="row-fluid">
 <div class="span2 offset2">
 <strong>${action.getText('province')}</strong>
 </div>
@@ -244,9 +270,10 @@ Initialization.pageView = function() {
 </#if>
 <div class="ajaxpanel" data-url="${dataurl}"></div>
 </div>
+</div>
 
-
-<div class="row" style="padding-top:20px;">
+<div class="section city">
+<div class="row-fluid">
 <div class="span2 offset2">
 <strong>${action.getText('city')}</strong>
 </div>
@@ -273,8 +300,10 @@ Initialization.pageView = function() {
 </#if>
 <div class="ajaxpanel" data-url="${dataurl}"></div>
 </div>
+</div>
 
-<div class="row" style="padding-top:20px;">
+<div class="section keyword">
+<div class="row-fluid">
 <div class="span2 offset2">
 <strong>${action.getText('keyword')}</strong>
 </div>
@@ -301,8 +330,10 @@ Initialization.pageView = function() {
 </#if>
 <div class="ajaxpanel" data-url="${dataurl}"></div>
 </div>
+</div>
 
-<div class="row" style="padding-top:20px;">
+<div class="section searchengine">
+<div class="row-fluid">
 <div class="span2 offset2">
 <strong>${action.getText('searchengine')}</strong>
 </div>
@@ -328,6 +359,7 @@ Initialization.pageView = function() {
 <#assign dataurl+='?'+request.queryString/>
 </#if>
 <div class="ajaxpanel" data-url="${dataurl}"></div>
+</div>
 </div>
 
 </body>
