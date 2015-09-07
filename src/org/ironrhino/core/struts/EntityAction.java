@@ -602,7 +602,7 @@ public class EntityAction<EN extends Persistable<?>> extends BaseAction {
 					&& StringUtils.isNotBlank(richtableConfig.order())) {
 				String[] ar = richtableConfig.order().split(",");
 				for (String s : ar) {
-					String[] arr = s.split("\\s+", 2);
+					String[] arr = s.trim().split("\\s+", 2);
 					String propertyName = arr[0];
 					if (propertyName.indexOf(".") > 0) {
 						String p1 = propertyName.substring(0,
