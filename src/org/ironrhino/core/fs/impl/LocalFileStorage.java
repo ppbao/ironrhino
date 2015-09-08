@@ -106,8 +106,7 @@ public class LocalFileStorage implements FileStorage {
 		String s2 = toPath.substring(0, fromPath.lastIndexOf('/'));
 		if (!s1.equals(s2))
 			return false;
-		return new File(directory, fromPath).renameTo(new File(directory,
-				toPath));
+		return new File(directory, fromPath).renameTo(new File(directory, toPath));
 	}
 
 	@Override
@@ -140,8 +139,7 @@ public class LocalFileStorage implements FileStorage {
 				return false;
 			}
 		});
-		List<Map.Entry<String, Boolean>> list = new ArrayList<Map.Entry<String, Boolean>>(
-				map.entrySet());
+		List<Map.Entry<String, Boolean>> list = new ArrayList<Map.Entry<String, Boolean>>(map.entrySet());
 		Collections.sort(list, comparator);
 		Map<String, Boolean> sortedMap = new LinkedHashMap<String, Boolean>();
 		for (Map.Entry<String, Boolean> entry : list)

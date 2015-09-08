@@ -32,26 +32,22 @@ public abstract class AbstractAnalyzer<T> implements Analyzer<T> {
 		this(new Date(), localhost);
 	}
 
-	public AbstractAnalyzer(Date date, boolean localhost)
-			throws FileNotFoundException {
-		this.iterator = newIterator(getLogFile(date, localhost).values()
-				.toArray(new File[0]));
+	public AbstractAnalyzer(Date date, boolean localhost) throws FileNotFoundException {
+		this.iterator = newIterator(getLogFile(date, localhost).values().toArray(new File[0]));
 	}
 
 	public AbstractAnalyzer(File file) throws FileNotFoundException {
 		this.iterator = newIterator(new File[] { file });
 	}
 
-	public AbstractAnalyzer(Date[] dates, boolean localhost)
-			throws FileNotFoundException {
+	public AbstractAnalyzer(Date[] dates, boolean localhost) throws FileNotFoundException {
 		List<File> list = new ArrayList<File>();
 		for (int i = 0; i < dates.length; i++)
 			list.addAll(getLogFile(dates[i], localhost).values());
 		this.iterator = newIterator(list.toArray(new File[0]));
 	}
 
-	public AbstractAnalyzer(Date start, Date end, boolean localhost)
-			throws FileNotFoundException {
+	public AbstractAnalyzer(Date start, Date end, boolean localhost) throws FileNotFoundException {
 		List<File> list = new ArrayList<File>();
 		Calendar cal = Calendar.getInstance();
 		cal.setTime(end);
@@ -69,13 +65,11 @@ public abstract class AbstractAnalyzer<T> implements Analyzer<T> {
 		this.iterator = iterator;
 	}
 
-	protected Iterator<KeyValuePair> newIterator(File[] files)
-			throws FileNotFoundException {
+	protected Iterator<KeyValuePair> newIterator(File[] files) throws FileNotFoundException {
 		for (File f : files)
 			if (!f.exists())
 				throw new FileNotFoundException(f.getAbsolutePath());
-		return new TextFileIterator<KeyValuePair>(StatLogSettings.ENCODING,
-				files) {
+		return new TextFileIterator<KeyValuePair>(StatLogSettings.ENCODING, files) {
 
 			@Override
 			protected KeyValuePair transform(String line, File f) {
@@ -87,8 +81,7 @@ public abstract class AbstractAnalyzer<T> implements Analyzer<T> {
 					date = new Date(Long.valueOf(array[2]));
 				} else {
 					try {
-						date = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss")
-								.parse(array[2]);
+						date = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss").parse(array[2]);
 					} catch (Exception e) {
 
 					}
@@ -128,8 +121,7 @@ public abstract class AbstractAnalyzer<T> implements Analyzer<T> {
 	protected abstract void process(KeyValuePair pair);
 
 	// host,file pair
-	public static Map<String, File> getLogFile(Date date,
-			final boolean localhost) {
+	public static Map<String, File> getLogFile(Date date, final boolean localhost) {
 		final Map<String, File> map = new TreeMap<String, File>();
 		StringBuilder sb = new StringBuilder();
 		if (localhost)
@@ -144,8 +136,7 @@ public abstract class AbstractAnalyzer<T> implements Analyzer<T> {
 			public boolean accept(File f) {
 				String name = f.getName();
 				if (localhost && name.equals(suffix)) {
-					map.put(name.substring(0,
-							name.lastIndexOf(StatLogSettings.SEPARATOR)), f);
+					map.put(name.substring(0, name.lastIndexOf(StatLogSettings.SEPARATOR)), f);
 					return true;
 				} else if (name.endsWith(suffix)) {
 					map.put(name.substring(0, name.lastIndexOf(suffix)), f);

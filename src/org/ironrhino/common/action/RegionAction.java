@@ -117,8 +117,7 @@ public class RegionAction extends BaseAction {
 				dc.addOrder(Order.asc("displayOrder"));
 				dc.addOrder(Order.asc("name"));
 				if (StringUtils.isNotBlank(keyword))
-					dc.add(CriterionUtils.like(keyword, "name", "areacode",
-							"postcode"));
+					dc.add(CriterionUtils.like(keyword, "name", "areacode", "postcode"));
 				region.setChildren(entityManager.findListByCriteria(dc));
 			}
 			list = region.getChildren();
@@ -148,9 +147,10 @@ public class RegionAction extends BaseAction {
 	}
 
 	@Override
-	@Validations(requiredStrings = { @RequiredStringValidator(type = ValidatorType.FIELD, fieldName = "region.name", trim = true, key = "validation.required") }, stringLengthFields = {
-			@StringLengthFieldValidator(type = ValidatorType.FIELD, fieldName = "region.areacode", maxLength = "6", key = "validation.invalid"),
-			@StringLengthFieldValidator(type = ValidatorType.FIELD, fieldName = "region.postcode", maxLength = "6", key = "validation.invalid") })
+	@Validations(requiredStrings = {
+			@RequiredStringValidator(type = ValidatorType.FIELD, fieldName = "region.name", trim = true, key = "validation.required") }, stringLengthFields = {
+					@StringLengthFieldValidator(type = ValidatorType.FIELD, fieldName = "region.areacode", maxLength = "6", key = "validation.invalid"),
+					@StringLengthFieldValidator(type = ValidatorType.FIELD, fieldName = "region.postcode", maxLength = "6", key = "validation.invalid") })
 	public String save() {
 		Collection<Region> siblings = null;
 		if (region.isNew()) {
@@ -167,15 +167,13 @@ public class RegionAction extends BaseAction {
 			}
 			for (Region sibling : siblings)
 				if (sibling.getName().equals(region.getName())) {
-					addFieldError("region.name",
-							getText("validation.already.exists"));
+					addFieldError("region.name", getText("validation.already.exists"));
 					return INPUT;
 				}
 		} else {
 			Region temp = region;
 			region = entityManager.get(temp.getId());
-			if (ServletActionContext.getRequest().getParameter(
-					"region.coordinate") != null) {
+			if (ServletActionContext.getRequest().getParameter("region.coordinate") != null) {
 				region.setCoordinate(temp.getCoordinate());
 			}
 			if (!region.getName().equals(temp.getName())) {
@@ -190,8 +188,7 @@ public class RegionAction extends BaseAction {
 				}
 				for (Region sibling : siblings)
 					if (sibling.getName().equals(temp.getName())) {
-						addFieldError("region.name",
-								getText("validation.already.exists"));
+						addFieldError("region.name", getText("validation.already.exists"));
 						return INPUT;
 					}
 			}
@@ -251,14 +248,12 @@ public class RegionAction extends BaseAction {
 		Integer[] ranks = zoom2rank(zoom);
 		DetachedCriteria dc = entityManager.detachedCriteria();
 		if (levels != null && ranks != null)
-			dc.add(Restrictions.or(Restrictions.in("level", levels),
-					Restrictions.in("rank", ranks)));
+			dc.add(Restrictions.or(Restrictions.in("level", levels), Restrictions.in("rank", ranks)));
 		else if (levels != null)
 			dc.add(Restrictions.in("level", levels));
 		else if (ranks != null)
 			dc.add(Restrictions.in("rank", ranks));
-		dc.add(Restrictions.and(
-				Restrictions.between("coordinate.latitude", bottom, top),
+		dc.add(Restrictions.and(Restrictions.between("coordinate.latitude", bottom, top),
 				Restrictions.between("coordinate.longitude", left, right)));
 		list = entityManager.findListByCriteria(dc);
 		return JSON;
@@ -304,9 +299,7 @@ public class RegionAction extends BaseAction {
 				addActionError(getText("validation.invalid"));
 				return SUCCESS;
 			}
-			if (!(source.getParent() == null && target == null || source
-					.getParent() != null
-					&& target != null
+			if (!(source.getParent() == null && target == null || source.getParent() != null && target != null
 					&& source.getParent().getId().equals(target.getId()))) {
 				source.setParent(target);
 				entityManager.save(source);
@@ -331,30 +324,22 @@ public class RegionAction extends BaseAction {
 				addActionError(getText("validation.required"));
 				return SUCCESS;
 			}
-			if (!source.isLeaf() || !target.isLeaf()
-					|| source.getId().equals(target.getId())) {
+			if (!source.isLeaf() || !target.isLeaf() || source.getId().equals(target.getId())) {
 				addActionError(getText("validation.invalid"));
 				return SUCCESS;
 			}
-			Collection<Class<?>> set = ClassScanner.scanAssignable(
-					ClassScanner.getAppPackages(), Persistable.class);
+			Collection<Class<?>> set = ClassScanner.scanAssignable(ClassScanner.getAppPackages(), Persistable.class);
 			for (Class<?> clz : set) {
 				if (clz.equals(Region.class))
 					continue;
-				PropertyDescriptor[] pds = BeanUtils
-						.getPropertyDescriptors(clz);
+				PropertyDescriptor[] pds = BeanUtils.getPropertyDescriptors(clz);
 				for (PropertyDescriptor pd : pds) {
-					if (pd.getReadMethod() != null
-							&& pd.getReadMethod().getReturnType()
-									.equals(Region.class)
+					if (pd.getReadMethod() != null && pd.getReadMethod().getReturnType().equals(Region.class)
 							&& pd.getWriteMethod() != null) {
 						String name = pd.getName();
-						String hql = new StringBuilder("update ")
-								.append(clz.getName()).append(" t set t.")
-								.append(name).append(".id=?1 where t.")
-								.append(name).append(".id=?2").toString();
-						entityManager.executeUpdate(hql, target.getId(),
-								source.getId());
+						String hql = new StringBuilder("update ").append(clz.getName()).append(" t set t.").append(name)
+								.append(".id=?1 where t.").append(name).append(".id=?2").toString();
+						entityManager.executeUpdate(hql, target.getId(), source.getId());
 					}
 				}
 			}

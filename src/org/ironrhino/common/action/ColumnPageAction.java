@@ -92,8 +92,7 @@ public class ColumnPageAction extends BaseAction {
 
 	public String list() {
 		columns = settingControl
-				.getStringArray(Constants.SETTING_KEY_CMS_PREFIX + getName()
-						+ Constants.SETTING_KEY_CMS_COLUMN_SUFFIX);
+				.getStringArray(Constants.SETTING_KEY_CMS_PREFIX + getName() + Constants.SETTING_KEY_CMS_COLUMN_SUFFIX);
 		column = getUid();
 		if (StringUtils.isBlank(column)) {
 			page = pageManager.getByPath("/" + getName() + "/preface");
@@ -107,15 +106,13 @@ public class ColumnPageAction extends BaseAction {
 		if (StringUtils.isBlank(column))
 			resultPage = pageManager.findResultPageByTag(resultPage, getName());
 		else
-			resultPage = pageManager.findResultPageByTag(resultPage,
-					new String[] { getName(), column });
+			resultPage = pageManager.findResultPageByTag(resultPage, new String[] { getName(), column });
 		return "columnlist";
 	}
 
 	public String p() {
 		columns = settingControl
-				.getStringArray(Constants.SETTING_KEY_CMS_PREFIX + getName()
-						+ Constants.SETTING_KEY_CMS_COLUMN_SUFFIX);
+				.getStringArray(Constants.SETTING_KEY_CMS_PREFIX + getName() + Constants.SETTING_KEY_CMS_COLUMN_SUFFIX);
 		String path = getUid();
 		if (StringUtils.isNotBlank(path)) {
 			path = "/" + path;

@@ -87,8 +87,7 @@ public class SettingControl {
 		entityManager.save(s);
 	}
 
-	public void setValue(String key, String value, boolean readonly,
-			boolean hidden) {
+	public void setValue(String key, String value, boolean readonly, boolean hidden) {
 		entityManager.setEntityClass(Setting.class);
 		Setting s = entityManager.findByNaturalId(key);
 		if (s != null) {
@@ -192,18 +191,15 @@ public class SettingControl {
 	public void setup() {
 		entityManager.setEntityClass(Setting.class);
 		Date now = new Date();
-		Setting sd = entityManager
-				.findOne(Constants.SETTING_KEY_SETUP_DATETIME);
+		Setting sd = entityManager.findOne(Constants.SETTING_KEY_SETUP_DATETIME);
 		if (sd == null) {
-			sd = new Setting(Constants.SETTING_KEY_SETUP_DATETIME,
-					DateUtils.formatDatetime(now));
+			sd = new Setting(Constants.SETTING_KEY_SETUP_DATETIME, DateUtils.formatDatetime(now));
 			sd.setReadonly(true);
 			entityManager.save(sd);
 		}
 		sd = entityManager.findOne(Constants.SETTING_KEY_SETUP_TIMESTAMP);
 		if (sd == null) {
-			sd = new Setting(Constants.SETTING_KEY_SETUP_TIMESTAMP,
-					String.valueOf(now.getTime()));
+			sd = new Setting(Constants.SETTING_KEY_SETUP_TIMESTAMP, String.valueOf(now.getTime()));
 			sd.setReadonly(true);
 			sd.setHidden(true);
 			entityManager.save(sd);

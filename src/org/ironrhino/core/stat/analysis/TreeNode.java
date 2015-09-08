@@ -110,8 +110,7 @@ public class TreeNode implements Serializable {
 		while (it.hasNext()) {
 			TreeNode node = it.next();
 			String path = StringUtils.join(node.getKey().getNames(), ">");
-			if (filter.equals(path) || path.startsWith(filter + ">")
-					|| filter.startsWith(path + ">"))
+			if (filter.equals(path) || path.startsWith(filter + ">") || filter.startsWith(path + ">"))
 				node.filter(filter);
 			else
 				it.remove();
@@ -133,13 +132,11 @@ public class TreeNode implements Serializable {
 				node.setValue(new Value(longValue, doubleValue));
 				for (TreeNode n : node.getChildren()) {
 					if (n.getValue().getLongValue() > 0)
-						n.setLongPercent(NumberUtils.formatPercent(((double) n
-								.getValue().getLongValue())
-								/ node.getValue().getLongValue(), 2));
+						n.setLongPercent(NumberUtils.formatPercent(
+								((double) n.getValue().getLongValue()) / node.getValue().getLongValue(), 2));
 					if (n.getValue().getDoubleValue() > 0)
-						n.setDoublePercent(NumberUtils.formatPercent(n
-								.getValue().getDoubleValue()
-								/ node.getValue().getDoubleValue(), 2));
+						n.setDoublePercent(NumberUtils
+								.formatPercent(n.getValue().getDoubleValue() / node.getValue().getDoubleValue(), 2));
 				}
 			}
 		};

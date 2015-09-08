@@ -37,8 +37,7 @@ public class TestConfiguration {
 
 		public static final int LOOP = 10000;
 
-		private ConcurrentHashMap<String, Long> map = new ConcurrentHashMap<String, Long>(
-				THREADS * LOOP * 2);
+		private ConcurrentHashMap<String, Long> map = new ConcurrentHashMap<String, Long>(THREADS * LOOP * 2);
 
 		private ExecutorService es = Executors.newFixedThreadPool(THREADS);
 
@@ -61,8 +60,7 @@ public class TestConfiguration {
 								Long time = System.currentTimeMillis();
 								Long old = map.putIfAbsent(id, time);
 								if (old != null)
-									System.out.println(id + " , old=" + old
-											+ " , new=" + time);
+									System.out.println(id + " , old=" + old + " , new=" + time);
 								else
 									count.incrementAndGet();
 							} catch (Throwable e) {
@@ -75,8 +73,8 @@ public class TestConfiguration {
 			}
 			es.shutdown();
 			cdl.await();
-			System.out.println("completed " + count.get() + " requests in "
-					+ (System.currentTimeMillis() - time) + "ms");
+			System.out
+					.println("completed " + count.get() + " requests in " + (System.currentTimeMillis() - time) + "ms");
 		}
 	}
 

@@ -14,18 +14,16 @@ public interface OAuthManager {
 
 	public Authorization grant(Client client, UserDetails grantor);
 
-	public Authorization generate(Client client, String redirectUri,
-			String scope, String responseType) throws Exception;
+	public Authorization generate(Client client, String redirectUri, String scope, String responseType)
+			throws Exception;
 
 	public Authorization reuse(Authorization authorization);
 
-	public Authorization grant(String authorizationId, UserDetails grantor)
-			throws Exception;
+	public Authorization grant(String authorizationId, UserDetails grantor) throws Exception;
 
 	public void deny(String authorizationId);
 
-	public Authorization authenticate(String code, Client client)
-			throws Exception;
+	public Authorization authenticate(String code, Client client) throws Exception;
 
 	public Authorization retrieve(String accessToken);
 

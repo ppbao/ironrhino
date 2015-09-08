@@ -66,7 +66,7 @@ public class Dictionary extends BaseEntity {
 	private String description;
 
 	@SearchableComponent
-	@UiConfig(hiddenInList = @Hidden(true))
+	@UiConfig(hiddenInList = @Hidden(true) )
 	@Transient
 	private List<LabelValue> items = new ArrayList<LabelValue>();
 
@@ -128,13 +128,10 @@ public class Dictionary extends BaseEntity {
 	@UiConfig(hidden = true)
 	@NotInCopy
 	public Map<String, String> getItemsAsMap() {
-		Map<String, String> map = new LinkedHashMap<String, String>(
-				items.size() + 1, 1);
+		Map<String, String> map = new LinkedHashMap<String, String>(items.size() + 1, 1);
 		for (LabelValue lv : items)
 			if (StringUtils.isNotBlank(lv.getValue()))
-				map.put(lv.getValue(),
-						StringUtils.isNotBlank(lv.getLabel()) ? lv.getLabel()
-								: lv.getValue());
+				map.put(lv.getValue(), StringUtils.isNotBlank(lv.getLabel()) ? lv.getLabel() : lv.getValue());
 		return map;
 	}
 
@@ -146,8 +143,7 @@ public class Dictionary extends BaseEntity {
 		for (LabelValue lv : items) {
 			if (StringUtils.isBlank(lv.getValue())) {
 				String label = lv.getLabel();
-				if ((StringUtils.isBlank(label))
-						&& StringUtils.isNotBlank(group)) {
+				if ((StringUtils.isBlank(label)) && StringUtils.isNotBlank(group)) {
 					group = "";
 				} else {
 					group = label;
@@ -158,9 +154,7 @@ public class Dictionary extends BaseEntity {
 					temp = new LinkedHashMap<String, String>();
 					map.put(group, temp);
 				}
-				temp.put(lv.getValue(),
-						StringUtils.isNotBlank(lv.getLabel()) ? lv.getLabel()
-								: lv.getValue());
+				temp.put(lv.getValue(), StringUtils.isNotBlank(lv.getLabel()) ? lv.getLabel() : lv.getValue());
 			}
 		}
 		return map;
@@ -171,8 +165,7 @@ public class Dictionary extends BaseEntity {
 	public boolean isGroupable() {
 		boolean groupable = false;
 		for (LabelValue item : items) {
-			if (StringUtils.isNotBlank(item.getLabel())
-					&& StringUtils.isBlank(item.getValue())) {
+			if (StringUtils.isNotBlank(item.getLabel()) && StringUtils.isBlank(item.getValue())) {
 				groupable = true;
 				break;
 			}
@@ -192,8 +185,7 @@ public class Dictionary extends BaseEntity {
 					String value = lv.getValue();
 					if (values.contains(value)) {
 						ValidationException ve = new ValidationException();
-						ve.addFieldError("dictionary.items[" + i + "].value",
-								"validation.already.exists");
+						ve.addFieldError("dictionary.items[" + i + "].value", "validation.already.exists");
 						throw ve;
 					} else {
 						values.add(value);
@@ -202,8 +194,7 @@ public class Dictionary extends BaseEntity {
 						String label = lv.getLabel();
 						if (labels.contains(label)) {
 							ValidationException ve = new ValidationException();
-							ve.addFieldError("dictionary.items[" + i
-									+ "].label", "validation.already.exists");
+							ve.addFieldError("dictionary.items[" + i + "].label", "validation.already.exists");
 							throw ve;
 						} else {
 							labels.add(label);

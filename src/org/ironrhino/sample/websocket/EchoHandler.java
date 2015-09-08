@@ -32,11 +32,9 @@ public class EchoHandler extends TextWebSocketHandler {
 		for (WebSocketSession s : sessions)
 			if (s.isOpen()) {
 				try {
-					if (roles.length == 0
-							|| AuthzUtils.authorizeUserDetails(
-									userDetailsService.loadUserByUsername(s
-											.getPrincipal().getName()), null,
-									StringUtils.join(roles, ","), null))
+					if (roles.length == 0 || AuthzUtils.authorizeUserDetails(
+							userDetailsService.loadUserByUsername(s.getPrincipal().getName()), null,
+							StringUtils.join(roles, ","), null))
 						s.sendMessage(new TextMessage(message));
 				} catch (IOException e) {
 					logger.error(e.getMessage(), e);
@@ -50,8 +48,7 @@ public class EchoHandler extends TextWebSocketHandler {
 		for (WebSocketSession s : sessions)
 			if (s.isOpen())
 				try {
-					if (p.evaluate(userDetailsService.loadUserByUsername(s
-							.getPrincipal().getName())))
+					if (p.evaluate(userDetailsService.loadUserByUsername(s.getPrincipal().getName())))
 						s.sendMessage(new TextMessage(message));
 				} catch (IOException e) {
 					logger.error(e.getMessage(), e);
@@ -59,15 +56,13 @@ public class EchoHandler extends TextWebSocketHandler {
 	}
 
 	@Override
-	public void afterConnectionClosed(WebSocketSession session,
-			CloseStatus status) throws Exception {
+	public void afterConnectionClosed(WebSocketSession session, CloseStatus status) throws Exception {
 		sessions.remove(session);
 		super.afterConnectionClosed(session, status);
 	}
 
 	@Override
-	public void afterConnectionEstablished(WebSocketSession session)
-			throws Exception {
+	public void afterConnectionEstablished(WebSocketSession session) throws Exception {
 		String username = session.getPrincipal().getName();
 		if (username == null) {
 			logger.warn("anonymous user denied");
@@ -81,12 +76,10 @@ public class EchoHandler extends TextWebSocketHandler {
 	}
 
 	@Override
-	public void handleTextMessage(WebSocketSession session, TextMessage message)
-			throws IOException {
+	public void handleTextMessage(WebSocketSession session, TextMessage message) throws IOException {
 		String username = session.getPrincipal().getName();
 		logger.info("received \"{}\" from {}", message.getPayload(), username);
-		String text = new StringBuilder(username).append(" send : ")
-				.append(message.getPayload()).toString();
+		String text = new StringBuilder(username).append(" send : ").append(message.getPayload()).toString();
 		session.sendMessage(new TextMessage(text));
 		broadcast("received \"" + message.getPayload() + "\" from " + username);
 	}

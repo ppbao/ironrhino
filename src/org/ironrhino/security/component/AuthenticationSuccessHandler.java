@@ -24,8 +24,7 @@ import org.springframework.stereotype.Component;
 
 @Component
 @Primary
-public class AuthenticationSuccessHandler extends
-		DefaultAuthenticationSuccessHandler {
+public class AuthenticationSuccessHandler extends DefaultAuthenticationSuccessHandler {
 
 	@Autowired
 	private UserManager userManager;
@@ -34,21 +33,17 @@ public class AuthenticationSuccessHandler extends
 	private MultiVersionPasswordEncoder multiVersionPasswordEncoder;
 
 	@Override
-	public void onAuthenticationSuccess(HttpServletRequest request,
-			HttpServletResponse response, Authentication authentication)
-			throws ServletException, IOException {
+	public void onAuthenticationSuccess(HttpServletRequest request, HttpServletResponse response,
+			Authentication authentication) throws ServletException, IOException {
 		super.onAuthenticationSuccess(request, response, authentication);
 		Object principal = authentication.getPrincipal();
 		String username;
 		if (principal instanceof User) {
 			User user = (User) principal;
 			username = user.getUsername();
-			if (multiVersionPasswordEncoder != null
-					&& authentication instanceof UsernamePasswordAuthenticationToken
-					&& !multiVersionPasswordEncoder.isLastVersion(user
-							.getPassword())) {
-				user.setLegiblePassword(authentication.getCredentials()
-						.toString());
+			if (multiVersionPasswordEncoder != null && authentication instanceof UsernamePasswordAuthenticationToken
+					&& !multiVersionPasswordEncoder.isLastVersion(user.getPassword())) {
+				user.setLegiblePassword(authentication.getCredentials().toString());
 				userManager.save(user);
 			}
 		} else if (principal instanceof UserDetails) {
@@ -65,8 +60,7 @@ public class AuthenticationSuccessHandler extends
 	private void save(final LoginRecord loginRecord) {
 		userManager.execute(new HibernateCallback<LoginRecord>() {
 			@Override
-			public LoginRecord doInHibernate(Session session)
-					throws HibernateException, SQLException {
+			public LoginRecord doInHibernate(Session session) throws HibernateException, SQLException {
 				session.save(loginRecord);
 				return null;
 			}

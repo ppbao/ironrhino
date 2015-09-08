@@ -202,9 +202,8 @@ public class FieldObject implements Serializable {
 				String name = pd.getName();
 				if (name.equals("class") || ignoreList.contains(name))
 					continue;
-				if (forRequest
-						&& (pd.getReadMethod() == null || pd.getWriteMethod() == null || pd.getWriteMethod()
-								.getAnnotation(JsonIgnore.class) != null))
+				if (forRequest && (pd.getReadMethod() == null || pd.getWriteMethod() == null
+						|| pd.getWriteMethod().getAnnotation(JsonIgnore.class) != null))
 					continue;
 				if (!forRequest
 						&& (pd.getReadMethod() == null || pd.getReadMethod().getAnnotation(JsonIgnore.class) != null))

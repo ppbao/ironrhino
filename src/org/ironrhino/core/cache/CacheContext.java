@@ -32,16 +32,14 @@ public class CacheContext {
 
 	private static CacheManager getCacheManager() {
 		if (cacheManager == null)
-			cacheManager = (CacheManager) ApplicationContextUtils
-					.getBean("cacheManager");
+			cacheManager = (CacheManager) ApplicationContextUtils.getBean("cacheManager");
 		return cacheManager;
 	}
 
 	public static boolean isForceFlush() {
 		try {
 			return ServletActionContext.getRequest() != null
-					&& ServletActionContext.getRequest().getParameter(
-							FORCE_FLUSH_PARAM_NAME) != null;
+					&& ServletActionContext.getRequest().getParameter(FORCE_FLUSH_PARAM_NAME) != null;
 		} catch (Exception e) {
 			return false;
 		}
@@ -54,11 +52,9 @@ public class CacheContext {
 				return null;
 			key = actualKey.toString();
 			scope = eval(scope).toString();
-			String content = (String) getCacheManager().get(
-					completeKey(key, scope), NAMESPACE_PAGE_FRAGMENT);
+			String content = (String) getCacheManager().get(completeKey(key, scope), NAMESPACE_PAGE_FRAGMENT);
 			if (content != null) {
-				if (ServletActionContext.getRequest()
-						.isRequestedSessionIdFromCookie())
+				if (ServletActionContext.getRequest().isRequestedSessionIdFromCookie())
 					return content;
 				else
 					return HtmlUtils.process(content, replacer);
@@ -77,16 +73,14 @@ public class CacheContext {
 			if (!st.getName().equals("a") || !attr.getKey().equals("href"))
 				return null;
 			String href = attr.getValue();
-			StringBuilder sb = new StringBuilder().append(attr.getName())
-					.append("=\"");
+			StringBuilder sb = new StringBuilder().append(attr.getName()).append("=\"");
 			sb.append(ServletActionContext.getResponse().encodeURL(href));
 			sb.append("\"");
 			return sb.toString();
 		}
 	};
 
-	public static void putPageFragment(String key, String content,
-			String scope, String timeToIdle, String timeToLive) {
+	public static void putPageFragment(String key, String content, String scope, String timeToIdle, String timeToLive) {
 		Object actualKey = eval(key);
 		if (actualKey == null)
 			return;
@@ -95,8 +89,7 @@ public class CacheContext {
 			scope = eval(scope).toString();
 			int _timeToIdle = Integer.valueOf(eval(timeToIdle).toString());
 			int _timeToLive = Integer.valueOf(eval(timeToLive).toString());
-			getCacheManager().put(completeKey(key, scope), content,
-					_timeToIdle, _timeToLive, TimeUnit.SECONDS,
+			getCacheManager().put(completeKey(key, scope), content, _timeToIdle, _timeToLive, TimeUnit.SECONDS,
 					NAMESPACE_PAGE_FRAGMENT);
 		} catch (Throwable e) {
 		}
@@ -116,8 +109,7 @@ public class CacheContext {
 		if (template == null)
 			return null;
 		template = template.trim();
-		OgnlContext ognl = (OgnlContext) ActionContext.getContext()
-				.getContextMap();
+		OgnlContext ognl = (OgnlContext) ActionContext.getContext().getContextMap();
 		Object value = ExpressionUtils.eval(template, ognl.getValues());
 		return value;
 	}

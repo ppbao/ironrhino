@@ -13,8 +13,7 @@ public class CriteriaState implements Serializable {
 
 	private Map<String, String> aliases = new HashMap<String, String>(4);
 
-	private Map<String, Boolean> orderings = new LinkedHashMap<String, Boolean>(
-			4);
+	private Map<String, Boolean> orderings = new LinkedHashMap<String, Boolean>(4);
 
 	private Set<String> criteria = new HashSet<String>();
 

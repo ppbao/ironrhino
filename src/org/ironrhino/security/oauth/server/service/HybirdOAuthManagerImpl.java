@@ -86,14 +86,11 @@ public class HybirdOAuthManagerImpl implements OAuthManager {
 		auth.setClient(client.getId());
 		auth.setRefreshToken(CodecUtils.nextId());
 		auth.setResponseType("token");
-		stringRedisTemplate.opsForValue().set(
-				NAMESPACE_AUTHORIZATION + auth.getId(), JsonUtils.toJson(auth),
+		stringRedisTemplate.opsForValue().set(NAMESPACE_AUTHORIZATION + auth.getId(), JsonUtils.toJson(auth),
 				expireTime, TimeUnit.SECONDS);
-		stringRedisTemplate.opsForValue().set(
-				NAMESPACE_AUTHORIZATION + auth.getAccessToken(), auth.getId(),
+		stringRedisTemplate.opsForValue().set(NAMESPACE_AUTHORIZATION + auth.getAccessToken(), auth.getId(),
 				auth.getExpiresIn(), TimeUnit.SECONDS);
-		stringRedisTemplate.opsForValue().set(
-				NAMESPACE_AUTHORIZATION + auth.getRefreshToken(), auth.getId(),
+		stringRedisTemplate.opsForValue().set(NAMESPACE_AUTHORIZATION + auth.getRefreshToken(), auth.getId(),
 				auth.getExpiresIn(), TimeUnit.SECONDS);
 		return auth;
 	}
@@ -108,24 +105,18 @@ public class HybirdOAuthManagerImpl implements OAuthManager {
 		auth.setGrantor(grantor.getUsername());
 		auth.setRefreshToken(CodecUtils.nextId());
 		auth.setResponseType("token");
-		stringRedisTemplate.opsForValue().set(
-				NAMESPACE_AUTHORIZATION + auth.getId(), JsonUtils.toJson(auth),
+		stringRedisTemplate.opsForValue().set(NAMESPACE_AUTHORIZATION + auth.getId(), JsonUtils.toJson(auth),
 				expireTime, TimeUnit.SECONDS);
-		stringRedisTemplate.opsForValue().set(
-				NAMESPACE_AUTHORIZATION + auth.getAccessToken(), auth.getId(),
+		stringRedisTemplate.opsForValue().set(NAMESPACE_AUTHORIZATION + auth.getAccessToken(), auth.getId(),
 				auth.getExpiresIn(), TimeUnit.SECONDS);
-		stringRedisTemplate.opsForValue().set(
-				NAMESPACE_AUTHORIZATION + auth.getRefreshToken(), auth.getId(),
+		stringRedisTemplate.opsForValue().set(NAMESPACE_AUTHORIZATION + auth.getRefreshToken(), auth.getId(),
 				auth.getExpiresIn(), TimeUnit.SECONDS);
-		stringRedisTemplate.opsForList().leftPush(
-				NAMESPACE_AUTHORIZATION_GRANTOR + auth.getGrantor(),
-				auth.getId());
+		stringRedisTemplate.opsForList().leftPush(NAMESPACE_AUTHORIZATION_GRANTOR + auth.getGrantor(), auth.getId());
 		return auth;
 	}
 
 	@Override
-	public Authorization generate(Client client, String redirectUri,
-			String scope, String responseType) {
+	public Authorization generate(Client client, String redirectUri, String scope, String responseType) {
 		if (!client.supportsRedirectUri(redirectUri))
 			throw new IllegalArgumentException("redirect_uri_mismatch");
 		Authorization auth = new Authorization();
@@ -137,8 +128,7 @@ public class HybirdOAuthManagerImpl implements OAuthManager {
 			auth.setScope(scope);
 		if (StringUtils.isNotBlank(responseType))
 			auth.setResponseType(responseType);
-		stringRedisTemplate.opsForValue().set(
-				NAMESPACE_AUTHORIZATION + auth.getId(), JsonUtils.toJson(auth),
+		stringRedisTemplate.opsForValue().set(NAMESPACE_AUTHORIZATION + auth.getId(), JsonUtils.toJson(auth),
 				expireTime, TimeUnit.SECONDS);
 		return auth;
 	}
@@ -148,12 +138,10 @@ public class HybirdOAuthManagerImpl implements OAuthManager {
 		auth.setCode(CodecUtils.nextId());
 		auth.setModifyDate(new Date());
 		auth.setLifetime(Authorization.DEFAULT_LIFETIME);
-		stringRedisTemplate.opsForValue().set(
-				NAMESPACE_AUTHORIZATION + auth.getId(), JsonUtils.toJson(auth),
+		stringRedisTemplate.opsForValue().set(NAMESPACE_AUTHORIZATION + auth.getId(), JsonUtils.toJson(auth),
 				expireTime, TimeUnit.SECONDS);
-		stringRedisTemplate.opsForValue().set(
-				NAMESPACE_AUTHORIZATION + auth.getCode(), auth.getId(),
-				expireTime, TimeUnit.SECONDS);
+		stringRedisTemplate.opsForValue().set(NAMESPACE_AUTHORIZATION + auth.getCode(), auth.getId(), expireTime,
+				TimeUnit.SECONDS);
 		return auth;
 	}
 
@@ -162,8 +150,7 @@ public class HybirdOAuthManagerImpl implements OAuthManager {
 		String key = NAMESPACE_AUTHORIZATION + authorizationId;
 		Authorization auth = null;
 		try {
-			auth = JsonUtils.fromJson(stringRedisTemplate.opsForValue()
-					.get(key), Authorization.class);
+			auth = JsonUtils.fromJson(stringRedisTemplate.opsForValue().get(key), Authorization.class);
 		} catch (Exception e) {
 			logger.error(e.getMessage(), e);
 		}
@@ -173,22 +160,17 @@ public class HybirdOAuthManagerImpl implements OAuthManager {
 		auth.setModifyDate(new Date());
 		if (auth.isClientSide()) {
 			stringRedisTemplate.delete(key);
-			stringRedisTemplate.opsForValue().set(
-					NAMESPACE_AUTHORIZATION + auth.getAccessToken(),
-					auth.getId(), auth.getExpiresIn(), TimeUnit.SECONDS);
-			stringRedisTemplate.opsForValue().set(
-					NAMESPACE_AUTHORIZATION + auth.getRefreshToken(),
-					auth.getId(), auth.getExpiresIn(), TimeUnit.SECONDS);
+			stringRedisTemplate.opsForValue().set(NAMESPACE_AUTHORIZATION + auth.getAccessToken(), auth.getId(),
+					auth.getExpiresIn(), TimeUnit.SECONDS);
+			stringRedisTemplate.opsForValue().set(NAMESPACE_AUTHORIZATION + auth.getRefreshToken(), auth.getId(),
+					auth.getExpiresIn(), TimeUnit.SECONDS);
 		} else {
 			auth.setCode(CodecUtils.nextId());
 			stringRedisTemplate.delete(key);
-			stringRedisTemplate.opsForValue().set(
-					NAMESPACE_AUTHORIZATION + auth.getCode(), auth.getId(),
-					expireTime, TimeUnit.SECONDS);
+			stringRedisTemplate.opsForValue().set(NAMESPACE_AUTHORIZATION + auth.getCode(), auth.getId(), expireTime,
+					TimeUnit.SECONDS);
 		}
-		stringRedisTemplate.opsForList().leftPush(
-				NAMESPACE_AUTHORIZATION_GRANTOR + auth.getGrantor(),
-				auth.getId());
+		stringRedisTemplate.opsForList().leftPush(NAMESPACE_AUTHORIZATION_GRANTOR + auth.getGrantor(), auth.getId());
 		return auth;
 	}
 
@@ -205,9 +187,8 @@ public class HybirdOAuthManagerImpl implements OAuthManager {
 			throw new IllegalArgumentException("code_invalid");
 		Authorization auth = null;
 		try {
-			auth = JsonUtils.fromJson(
-					stringRedisTemplate.opsForValue().get(
-							NAMESPACE_AUTHORIZATION + id), Authorization.class);
+			auth = JsonUtils.fromJson(stringRedisTemplate.opsForValue().get(NAMESPACE_AUTHORIZATION + id),
+					Authorization.class);
 		} catch (Exception e) {
 			logger.error(e.getMessage(), e);
 		}
@@ -228,13 +209,10 @@ public class HybirdOAuthManagerImpl implements OAuthManager {
 		auth.setRefreshToken(CodecUtils.nextId());
 		auth.setModifyDate(new Date());
 		stringRedisTemplate.delete(key);
-		stringRedisTemplate.opsForValue().set(
-				NAMESPACE_AUTHORIZATION + auth.getId(), JsonUtils.toJson(auth),
+		stringRedisTemplate.opsForValue().set(NAMESPACE_AUTHORIZATION + auth.getId(), JsonUtils.toJson(auth),
 				auth.getExpiresIn(), TimeUnit.SECONDS);
-		stringRedisTemplate.opsForValue().set(
-				NAMESPACE_AUTHORIZATION + auth.getRefreshToken(),
-				NAMESPACE_AUTHORIZATION + auth.getId(), auth.getExpiresIn(),
-				TimeUnit.SECONDS);
+		stringRedisTemplate.opsForValue().set(NAMESPACE_AUTHORIZATION + auth.getRefreshToken(),
+				NAMESPACE_AUTHORIZATION + auth.getId(), auth.getExpiresIn(), TimeUnit.SECONDS);
 		return auth;
 	}
 
@@ -246,9 +224,8 @@ public class HybirdOAuthManagerImpl implements OAuthManager {
 			return null;
 		Authorization auth = null;
 		try {
-			auth = JsonUtils.fromJson(
-					stringRedisTemplate.opsForValue().get(
-							NAMESPACE_AUTHORIZATION + id), Authorization.class);
+			auth = JsonUtils.fromJson(stringRedisTemplate.opsForValue().get(NAMESPACE_AUTHORIZATION + id),
+					Authorization.class);
 		} catch (Exception e) {
 			logger.error(e.getMessage(), e);
 		}
@@ -270,25 +247,21 @@ public class HybirdOAuthManagerImpl implements OAuthManager {
 			throw new IllegalArgumentException("invalid_token");
 		Authorization auth = null;
 		try {
-			auth = JsonUtils.fromJson(
-					stringRedisTemplate.opsForValue().get(
-							NAMESPACE_AUTHORIZATION + id), Authorization.class);
+			auth = JsonUtils.fromJson(stringRedisTemplate.opsForValue().get(NAMESPACE_AUTHORIZATION + id),
+					Authorization.class);
 		} catch (Exception e) {
 			logger.error(e.getMessage(), e);
 		}
 		if (auth == null)
 			throw new IllegalArgumentException("invalid_token");
 		stringRedisTemplate.delete(keyRefreshToken);
-		stringRedisTemplate.delete(NAMESPACE_AUTHORIZATION
-				+ auth.getAccessToken());
+		stringRedisTemplate.delete(NAMESPACE_AUTHORIZATION + auth.getAccessToken());
 		auth.setAccessToken(CodecUtils.nextId());
 		auth.setRefreshToken(CodecUtils.nextId());
 		auth.setModifyDate(new Date());
-		stringRedisTemplate.opsForValue().set(
-				NAMESPACE_AUTHORIZATION + auth.getAccessToken(), auth.getId(),
+		stringRedisTemplate.opsForValue().set(NAMESPACE_AUTHORIZATION + auth.getAccessToken(), auth.getId(),
 				auth.getExpiresIn(), TimeUnit.SECONDS);
-		stringRedisTemplate.opsForValue().set(
-				NAMESPACE_AUTHORIZATION + auth.getRefreshToken(), auth.getId(),
+		stringRedisTemplate.opsForValue().set(NAMESPACE_AUTHORIZATION + auth.getRefreshToken(), auth.getId(),
 				auth.getExpiresIn(), TimeUnit.SECONDS);
 		return auth;
 	}
@@ -301,42 +274,33 @@ public class HybirdOAuthManagerImpl implements OAuthManager {
 			return;
 		Authorization auth = null;
 		try {
-			auth = JsonUtils.fromJson(
-					stringRedisTemplate.opsForValue().get(
-							NAMESPACE_AUTHORIZATION + id), Authorization.class);
+			auth = JsonUtils.fromJson(stringRedisTemplate.opsForValue().get(NAMESPACE_AUTHORIZATION + id),
+					Authorization.class);
 		} catch (Exception e) {
 			logger.error(e.getMessage(), e);
 		}
 		if (auth != null) {
 			stringRedisTemplate.delete(NAMESPACE_AUTHORIZATION + auth.getId());
 			stringRedisTemplate.delete(key);
-			stringRedisTemplate.delete(NAMESPACE_AUTHORIZATION
-					+ auth.getRefreshToken());
-			stringRedisTemplate.opsForList().remove(
-					NAMESPACE_AUTHORIZATION_GRANTOR + auth.getGrantor(), 0,
+			stringRedisTemplate.delete(NAMESPACE_AUTHORIZATION + auth.getRefreshToken());
+			stringRedisTemplate.opsForList().remove(NAMESPACE_AUTHORIZATION_GRANTOR + auth.getGrantor(), 0,
 					auth.getId());
 		}
 	}
 
 	@Override
 	public void create(Authorization auth) {
-		stringRedisTemplate.opsForValue().set(
-				NAMESPACE_AUTHORIZATION + auth.getAccessToken(), auth.getId(),
+		stringRedisTemplate.opsForValue().set(NAMESPACE_AUTHORIZATION + auth.getAccessToken(), auth.getId(),
 				auth.getExpiresIn(), TimeUnit.SECONDS);
-		stringRedisTemplate.opsForValue().set(
-				NAMESPACE_AUTHORIZATION + auth.getRefreshToken(), auth.getId(),
+		stringRedisTemplate.opsForValue().set(NAMESPACE_AUTHORIZATION + auth.getRefreshToken(), auth.getId(),
 				auth.getExpiresIn(), TimeUnit.SECONDS);
-		stringRedisTemplate.opsForList().leftPush(
-				NAMESPACE_AUTHORIZATION_GRANTOR + auth.getGrantor(),
-				auth.getId());
+		stringRedisTemplate.opsForList().leftPush(NAMESPACE_AUTHORIZATION_GRANTOR + auth.getGrantor(), auth.getId());
 	}
 
 	@Override
 	public List<Authorization> findAuthorizationsByGrantor(UserDetails grantor) {
-		String keyForList = NAMESPACE_AUTHORIZATION_GRANTOR
-				+ grantor.getUsername();
-		List<String> tokens = stringRedisTemplate.opsForList().range(
-				keyForList, 0, -1);
+		String keyForList = NAMESPACE_AUTHORIZATION_GRANTOR + grantor.getUsername();
+		List<String> tokens = stringRedisTemplate.opsForList().range(keyForList, 0, -1);
 		if (tokens == null || tokens.isEmpty())
 			return Collections.emptyList();
 		List<String> keys = new ArrayList<String>(tokens.size());

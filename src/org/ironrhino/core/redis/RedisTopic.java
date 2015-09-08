@@ -19,8 +19,7 @@ import org.springframework.data.redis.listener.Topic;
 import org.springframework.data.redis.serializer.SerializationException;
 
 @SuppressWarnings("rawtypes")
-public abstract class RedisTopic<T extends Serializable> implements
-		org.ironrhino.core.message.Topic<T> {
+public abstract class RedisTopic<T extends Serializable> implements org.ironrhino.core.message.Topic<T> {
 
 	protected String channelName;
 
@@ -50,14 +49,12 @@ public abstract class RedisTopic<T extends Serializable> implements
 	@SuppressWarnings("unchecked")
 	public void afterPropertiesSet() {
 		Topic globalTopic = new ChannelTopic(getChannelName(Scope.GLOBAL));
-		Topic applicationTopic = new ChannelTopic(
-				getChannelName(Scope.APPLICATION));
+		Topic applicationTopic = new ChannelTopic(getChannelName(Scope.APPLICATION));
 		messageListenerContainer.addMessageListener(new MessageListener() {
 			@Override
 			public void onMessage(Message message, byte[] pattern) {
 				try {
-					subscribe((T) redisTemplate.getValueSerializer()
-							.deserialize(message.getBody()));
+					subscribe((T) redisTemplate.getValueSerializer().deserialize(message.getBody()));
 				} catch (SerializationException e) {
 					// message from other app
 					if (!(e.getCause() instanceof ClassNotFoundException))

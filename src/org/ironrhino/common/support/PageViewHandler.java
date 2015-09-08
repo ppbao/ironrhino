@@ -29,12 +29,9 @@ public class PageViewHandler extends AccessHandler {
 	private HttpSessionManager httpSessionManager;
 
 	@Override
-	public boolean handle(final HttpServletRequest request,
-			HttpServletResponse response) {
-		if (pageViewService != null
-				&& request.getMethod().equalsIgnoreCase("GET")
-				&& !RequestUtils.isInternalTesting(request)
-				&& !request.getRequestURI().startsWith("/assets/")
+	public boolean handle(final HttpServletRequest request, HttpServletResponse response) {
+		if (pageViewService != null && request.getMethod().equalsIgnoreCase("GET")
+				&& !RequestUtils.isInternalTesting(request) && !request.getRequestURI().startsWith("/assets/")
 				&& !request.getRequestURI().endsWith("/favicon.ico")) {
 			final String remoteAddr = request.getRemoteAddr();
 			final String requestURL = request.getRequestURL().toString();
@@ -44,8 +41,7 @@ public class PageViewHandler extends AccessHandler {
 			Runnable task = new Runnable() {
 				@Override
 				public void run() {
-					pageViewService.put(new Date(), remoteAddr, requestURL,
-							sessionId, username, referer);
+					pageViewService.put(new Date(), remoteAddr, requestURL, sessionId, username, referer);
 				}
 			};
 			if (executorService != null)

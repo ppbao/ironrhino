@@ -63,8 +63,7 @@ public class PageAction extends EntityAction<Page> {
 	public String execute() {
 		if (StringUtils.isBlank(keyword) || elasticSearchService == null) {
 			DetachedCriteria dc = pageManager.detachedCriteria();
-			CriteriaState criteriaState = CriterionUtils.filter(dc,
-					getEntityClass());
+			CriteriaState criteriaState = CriterionUtils.filter(dc, getEntityClass());
 			if (StringUtils.isNotBlank(keyword)) {
 				if (keyword.startsWith("tags:")) {
 					String tags = keyword.replace("tags:", "");
@@ -85,10 +84,8 @@ public class PageAction extends EntityAction<Page> {
 			resultPage = pageManager.findByResultPage(resultPage);
 		} else {
 			String query = keyword.trim();
-			String url = ServletActionContext.getRequest().getRequestURL()
-					.toString();
-			String referer = ServletActionContext.getRequest().getHeader(
-					"Referer");
+			String url = ServletActionContext.getRequest().getRequestURL().toString();
+			String referer = ServletActionContext.getRequest().getHeader("Referer");
 			if (referer != null && referer.startsWith(url))
 				try {
 					Thread.sleep(1000); // wait index
@@ -152,7 +149,8 @@ public class PageAction extends EntityAction<Page> {
 
 	@Override
 	@JsonConfig(propertyName = "page")
-	@Validations(requiredStrings = { @RequiredStringValidator(type = ValidatorType.FIELD, fieldName = "page.path", trim = true, key = "validation.required") })
+	@Validations(requiredStrings = {
+			@RequiredStringValidator(type = ValidatorType.FIELD, fieldName = "page.path", trim = true, key = "validation.required") })
 	public String save() {
 		if (!makeEntityValid())
 			return INPUT;
@@ -187,7 +185,8 @@ public class PageAction extends EntityAction<Page> {
 		return INPUT;
 	}
 
-	@Validations(requiredStrings = { @RequiredStringValidator(type = ValidatorType.FIELD, fieldName = "page.path", trim = true, key = "validation.required") })
+	@Validations(requiredStrings = {
+			@RequiredStringValidator(type = ValidatorType.FIELD, fieldName = "page.path", trim = true, key = "validation.required") })
 	public String checkavailable() {
 		return makeEntityValid() ? NONE : INPUT;
 	}
@@ -205,8 +204,7 @@ public class PageAction extends EntityAction<Page> {
 			}
 		} else {
 			Page p = pageManager.get(page.getId());
-			if (!page.getPath().equals(p.getPath())
-					&& pageManager.findByNaturalId(page.getPath()) != null) {
+			if (!page.getPath().equals(p.getPath()) && pageManager.findByNaturalId(page.getPath()) != null) {
 				addFieldError("page.path", getText("validation.already.exists"));
 				return false;
 			}
@@ -229,7 +227,8 @@ public class PageAction extends EntityAction<Page> {
 		return SUCCESS;
 	}
 
-	@Validations(requiredStrings = { @RequiredStringValidator(type = ValidatorType.FIELD, fieldName = "page.content", trim = true, key = "validation.required") })
+	@Validations(requiredStrings = {
+			@RequiredStringValidator(type = ValidatorType.FIELD, fieldName = "page.content", trim = true, key = "validation.required") })
 	public String editme() {
 		String content = page.getContent();
 		page = pageManager.get(getUid());
@@ -249,8 +248,7 @@ public class PageAction extends EntityAction<Page> {
 		for (Map.Entry<String, Integer> entry : map.entrySet()) {
 			LabelValue lv = new LabelValue();
 			lv.setValue(entry.getKey());
-			lv.setLabel(new StringBuilder(entry.getKey()).append("(")
-					.append(entry.getValue()).append(")").toString());
+			lv.setLabel(new StringBuilder(entry.getKey()).append("(").append(entry.getValue()).append(")").toString());
 			suggestions.add(lv);
 		}
 		return JSON;

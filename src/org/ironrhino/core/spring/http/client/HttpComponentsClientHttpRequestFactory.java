@@ -11,17 +11,15 @@ import org.apache.http.protocol.HttpContext;
 import org.ironrhino.core.servlet.AccessFilter;
 import org.slf4j.MDC;
 
-public class HttpComponentsClientHttpRequestFactory extends
-		org.springframework.http.client.HttpComponentsClientHttpRequestFactory {
+public class HttpComponentsClientHttpRequestFactory
+		extends org.springframework.http.client.HttpComponentsClientHttpRequestFactory {
 
 	public HttpComponentsClientHttpRequestFactory() {
-		HttpClient httpClient = HttpClients.custom().disableAuthCaching()
-				.disableConnectionState().disableCookieManagement()
-				.setMaxConnPerRoute(1000).setMaxConnTotal(1000)
+		HttpClient httpClient = HttpClients.custom().disableAuthCaching().disableConnectionState()
+				.disableCookieManagement().setMaxConnPerRoute(1000).setMaxConnTotal(1000)
 				.setRetryHandler(new HttpRequestRetryHandler() {
 					@Override
-					public boolean retryRequest(IOException ex,
-							int executionCount, HttpContext context) {
+					public boolean retryRequest(IOException ex, int executionCount, HttpContext context) {
 						if (executionCount > 3)
 							return false;
 						if (ex instanceof NoHttpResponseException)

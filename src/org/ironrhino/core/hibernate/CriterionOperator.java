@@ -21,14 +21,10 @@ public enum CriterionOperator implements Displayable {
 		public boolean supports(Class<?> clazz) {
 			if (clazz == null)
 				return false;
-			return clazz == short.class || clazz == int.class
-					|| clazz == long.class || clazz == float.class
-					|| clazz == double.class || clazz == boolean.class
-					|| clazz == Boolean.class
-					|| Number.class.isAssignableFrom(clazz)
-					|| clazz.equals(String.class) || clazz.equals(Date.class)
-					|| Persistable.class.isAssignableFrom(clazz)
-					|| clazz.isEnum();
+			return clazz == short.class || clazz == int.class || clazz == long.class || clazz == float.class
+					|| clazz == double.class || clazz == boolean.class || clazz == Boolean.class
+					|| Number.class.isAssignableFrom(clazz) || clazz.equals(String.class) || clazz.equals(Date.class)
+					|| Persistable.class.isAssignableFrom(clazz) || clazz.isEnum();
 		}
 
 		@Override
@@ -37,8 +33,7 @@ public enum CriterionOperator implements Displayable {
 				return null;
 			Object value1 = value[0];
 			if (value1 instanceof Date && DateUtils.isBeginOfDay((Date) value1))
-				return Restrictions.between(name, value1,
-						DateUtils.endOfDay((Date) value1));
+				return Restrictions.between(name, value1, DateUtils.endOfDay((Date) value1));
 			else
 				return Restrictions.eq(name, value1);
 		}
@@ -46,13 +41,9 @@ public enum CriterionOperator implements Displayable {
 	NEQ(1) {
 		@Override
 		public boolean supports(Class<?> clazz) {
-			return clazz == short.class || clazz == int.class
-					|| clazz == long.class || clazz == float.class
-					|| clazz == double.class || clazz.equals(String.class)
-					|| Number.class.isAssignableFrom(clazz)
-					|| clazz.equals(Date.class)
-					|| Persistable.class.isAssignableFrom(clazz)
-					|| clazz.isEnum();
+			return clazz == short.class || clazz == int.class || clazz == long.class || clazz == float.class
+					|| clazz == double.class || clazz.equals(String.class) || Number.class.isAssignableFrom(clazz)
+					|| clazz.equals(Date.class) || Persistable.class.isAssignableFrom(clazz) || clazz.isEnum();
 		}
 
 		@Override
@@ -61,22 +52,17 @@ public enum CriterionOperator implements Displayable {
 				return null;
 			Object value1 = value[0];
 			if (value1 instanceof Date && DateUtils.isBeginOfDay((Date) value1))
-				return Restrictions.or(Restrictions.isNull(name), Restrictions
-						.or(Restrictions.lt(name, value1),
-								Restrictions.gt(name,
-										DateUtils.endOfDay((Date) value1))));
+				return Restrictions.or(Restrictions.isNull(name), Restrictions.or(Restrictions.lt(name, value1),
+						Restrictions.gt(name, DateUtils.endOfDay((Date) value1))));
 			else
-				return Restrictions.or(Restrictions.isNull(name),
-						Restrictions.not(Restrictions.eq(name, value1)));
+				return Restrictions.or(Restrictions.isNull(name), Restrictions.not(Restrictions.eq(name, value1)));
 		}
 	},
 	LT(1) {
 		@Override
 		public boolean supports(Class<?> clazz) {
-			return clazz == short.class || clazz == int.class
-					|| clazz == long.class || clazz == float.class
-					|| clazz == double.class || clazz.equals(String.class)
-					|| Number.class.isAssignableFrom(clazz)
+			return clazz == short.class || clazz == int.class || clazz == long.class || clazz == float.class
+					|| clazz == double.class || clazz.equals(String.class) || Number.class.isAssignableFrom(clazz)
 					|| clazz.equals(Date.class);
 		}
 
@@ -91,10 +77,8 @@ public enum CriterionOperator implements Displayable {
 	LE(1) {
 		@Override
 		public boolean supports(Class<?> clazz) {
-			return clazz == short.class || clazz == int.class
-					|| clazz == long.class || clazz == float.class
-					|| clazz == double.class || clazz.equals(String.class)
-					|| Number.class.isAssignableFrom(clazz)
+			return clazz == short.class || clazz == int.class || clazz == long.class || clazz == float.class
+					|| clazz == double.class || clazz.equals(String.class) || Number.class.isAssignableFrom(clazz)
 					|| clazz.equals(Date.class);
 		}
 
@@ -112,10 +96,8 @@ public enum CriterionOperator implements Displayable {
 	GT(1) {
 		@Override
 		public boolean supports(Class<?> clazz) {
-			return clazz == short.class || clazz == int.class
-					|| clazz == long.class || clazz == float.class
-					|| clazz == double.class || clazz.equals(String.class)
-					|| Number.class.isAssignableFrom(clazz)
+			return clazz == short.class || clazz == int.class || clazz == long.class || clazz == float.class
+					|| clazz == double.class || clazz.equals(String.class) || Number.class.isAssignableFrom(clazz)
 					|| clazz.equals(Date.class);
 		}
 
@@ -133,10 +115,8 @@ public enum CriterionOperator implements Displayable {
 	GE(1) {
 		@Override
 		public boolean supports(Class<?> clazz) {
-			return clazz == short.class || clazz == int.class
-					|| clazz == long.class || clazz == float.class
-					|| clazz == double.class || clazz.equals(String.class)
-					|| Number.class.isAssignableFrom(clazz)
+			return clazz == short.class || clazz == int.class || clazz == long.class || clazz == float.class
+					|| clazz == double.class || clazz.equals(String.class) || Number.class.isAssignableFrom(clazz)
 					|| clazz.equals(Date.class);
 		}
 
@@ -151,18 +131,15 @@ public enum CriterionOperator implements Displayable {
 	BETWEEN(2) {
 		@Override
 		public boolean supports(Class<?> clazz) {
-			return clazz == short.class || clazz == int.class
-					|| clazz == long.class || clazz == float.class
-					|| clazz == double.class || clazz.equals(String.class)
-					|| Number.class.isAssignableFrom(clazz)
+			return clazz == short.class || clazz == int.class || clazz == long.class || clazz == float.class
+					|| clazz == double.class || clazz.equals(String.class) || Number.class.isAssignableFrom(clazz)
 					|| clazz.equals(Date.class);
 		}
 
 		@Override
 		public boolean isEffective(Class<?> clazz, String... value) {
 			return (value != null && value.length == 2)
-					&& (StringUtils.isNotBlank(value[0]) || StringUtils
-							.isNotBlank(value[1]));
+					&& (StringUtils.isNotBlank(value[0]) || StringUtils.isNotBlank(value[1]));
 		}
 
 		@Override
@@ -190,18 +167,15 @@ public enum CriterionOperator implements Displayable {
 	NOTBETWEEN(2) {
 		@Override
 		public boolean supports(Class<?> clazz) {
-			return clazz == short.class || clazz == int.class
-					|| clazz == long.class || clazz == float.class
-					|| clazz == double.class || clazz.equals(String.class)
-					|| Number.class.isAssignableFrom(clazz)
+			return clazz == short.class || clazz == int.class || clazz == long.class || clazz == float.class
+					|| clazz == double.class || clazz.equals(String.class) || Number.class.isAssignableFrom(clazz)
 					|| clazz.equals(Date.class);
 		}
 
 		@Override
 		public boolean isEffective(Class<?> clazz, String... value) {
 			return (value != null && value.length == 2)
-					&& (StringUtils.isNotBlank(value[0]) || StringUtils
-							.isNotBlank(value[1]));
+					&& (StringUtils.isNotBlank(value[0]) || StringUtils.isNotBlank(value[1]));
 		}
 
 		@Override
@@ -217,8 +191,7 @@ public enum CriterionOperator implements Displayable {
 			if (value2 instanceof Date && DateUtils.isBeginOfDay((Date) value2))
 				value2 = DateUtils.endOfDay((Date) value2);
 			if (value1 != null && value2 != null)
-				return Restrictions.or(Restrictions.lt(name, value1),
-						Restrictions.gt(name, value2));
+				return Restrictions.or(Restrictions.lt(name, value1), Restrictions.gt(name, value2));
 			else if (value1 != null)
 				return Restrictions.lt(name, value1);
 			else if (value2 != null)
@@ -230,11 +203,8 @@ public enum CriterionOperator implements Displayable {
 	ISNULL(0) {
 		@Override
 		public boolean supports(Class<?> clazz) {
-			return clazz.equals(String.class) || clazz.equals(Boolean.class)
-					|| Number.class.isAssignableFrom(clazz)
-					|| clazz.equals(Date.class)
-					|| Persistable.class.isAssignableFrom(clazz)
-					|| clazz.isEnum();
+			return clazz.equals(String.class) || clazz.equals(Boolean.class) || Number.class.isAssignableFrom(clazz)
+					|| clazz.equals(Date.class) || Persistable.class.isAssignableFrom(clazz) || clazz.isEnum();
 		}
 
 		@Override
@@ -250,11 +220,8 @@ public enum CriterionOperator implements Displayable {
 	ISNOTNULL(0) {
 		@Override
 		public boolean supports(Class<?> clazz) {
-			return clazz.equals(String.class) || clazz.equals(Boolean.class)
-					|| Number.class.isAssignableFrom(clazz)
-					|| clazz.equals(Date.class)
-					|| Persistable.class.isAssignableFrom(clazz)
-					|| clazz.isEnum();
+			return clazz.equals(String.class) || clazz.equals(Boolean.class) || Number.class.isAssignableFrom(clazz)
+					|| clazz.equals(Date.class) || Persistable.class.isAssignableFrom(clazz) || clazz.isEnum();
 		}
 
 		@Override
@@ -312,8 +279,7 @@ public enum CriterionOperator implements Displayable {
 
 		@Override
 		public Criterion operator(String name, Object... value) {
-			return Restrictions.or(Restrictions.isNull(name),
-					Restrictions.eq(name, ""));
+			return Restrictions.or(Restrictions.isNull(name), Restrictions.eq(name, ""));
 		}
 	},
 	ISNOTBLANK(0) {
@@ -359,8 +325,7 @@ public enum CriterionOperator implements Displayable {
 			if (value == null || value.length == 0)
 				return null;
 			Object value1 = value[0];
-			return Restrictions.not(Restrictions.like(name, (String) value1,
-					MatchMode.ANYWHERE));
+			return Restrictions.not(Restrictions.like(name, (String) value1, MatchMode.ANYWHERE));
 		}
 	},
 	ISTRUE(0) {
@@ -477,8 +442,7 @@ public enum CriterionOperator implements Displayable {
 			return Collections.emptyList();
 		List<String> list = new ArrayList<String>();
 		for (CriterionOperator op : values())
-			if (op.supports(clazz)
-					&& !(op == EQ && (clazz == Boolean.class || clazz == boolean.class)))
+			if (op.supports(clazz) && !(op == EQ && (clazz == Boolean.class || clazz == boolean.class)))
 				list.add(op.name());
 		return list;
 	}

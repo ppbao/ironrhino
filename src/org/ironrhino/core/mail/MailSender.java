@@ -50,10 +50,8 @@ public class MailSender {
 		for (final String to : smm.getTo()) {
 			javaMailSender.send(new MimeMessagePreparator() {
 				@Override
-				public void prepare(MimeMessage mimeMessage)
-						throws MessagingException {
-					MimeMessageHelper message = new MimeMessageHelper(
-							mimeMessage, true, "UTF-8");
+				public void prepare(MimeMessage mimeMessage) throws MessagingException {
+					MimeMessageHelper message = new MimeMessageHelper(mimeMessage, true, "UTF-8");
 					if (StringUtils.isNotBlank(smm.getFrom()))
 						message.setFrom(encode(smm.getFrom()));
 					else

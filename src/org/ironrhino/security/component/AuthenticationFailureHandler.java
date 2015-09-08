@@ -22,8 +22,7 @@ import org.springframework.stereotype.Component;
 
 @Component
 @Primary
-public class AuthenticationFailureHandler extends
-		DefaultAuthenticationFailureHandler {
+public class AuthenticationFailureHandler extends DefaultAuthenticationFailureHandler {
 
 	@Autowired
 	private UsernamePasswordAuthenticationFilter usernamePasswordAuthenticationFilter;
@@ -32,14 +31,11 @@ public class AuthenticationFailureHandler extends
 	private UserManager userManager;
 
 	@Override
-	public void onAuthenticationFailure(HttpServletRequest request,
-			HttpServletResponse response, AuthenticationException e)
-			throws IOException, ServletException {
+	public void onAuthenticationFailure(HttpServletRequest request, HttpServletResponse response,
+			AuthenticationException e) throws IOException, ServletException {
 		super.onAuthenticationFailure(request, response, e);
 		LoginRecord loginRecord = new LoginRecord();
-		loginRecord.setUsername(request
-				.getParameter(usernamePasswordAuthenticationFilter
-						.getUsernameParameter()));
+		loginRecord.setUsername(request.getParameter(usernamePasswordAuthenticationFilter.getUsernameParameter()));
 		loginRecord.setAddress(request.getRemoteAddr());
 		loginRecord.setFailed(true);
 		loginRecord.setCause(I18N.getText(e.getClass().getName()));
@@ -50,8 +46,7 @@ public class AuthenticationFailureHandler extends
 	private void save(final LoginRecord loginRecord) {
 		userManager.execute(new HibernateCallback<LoginRecord>() {
 			@Override
-			public LoginRecord doInHibernate(Session session)
-					throws HibernateException, SQLException {
+			public LoginRecord doInHibernate(Session session) throws HibernateException, SQLException {
 				session.save(loginRecord);
 				return null;
 			}

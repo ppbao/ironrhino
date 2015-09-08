@@ -190,5 +190,5 @@ public class Client extends BaseEntity implements Enableable, Attachmentable {
 	public int hashCode() {
 		return id != null ? id.hashCode() : -1;
 	}
-	
+
 }

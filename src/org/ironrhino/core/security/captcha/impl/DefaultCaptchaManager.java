@@ -35,11 +35,10 @@ public class DefaultCaptchaManager implements CaptchaManager {
 
 	@Override
 	public String getChallenge(HttpServletRequest request, String token) {
-		String challenge = String.valueOf(ThreadLocalRandom.current().nextInt(
-				8999) + 1000);// width=60
+		String challenge = String.valueOf(ThreadLocalRandom.current().nextInt(8999) + 1000);// width=60
 		String answer = answer(challenge);
-		cacheManager.put(CACHE_PREFIX_ANSWER + token, answer, -1,
-				CACHE_ANSWER_TIME_TO_LIVE, TimeUnit.SECONDS, KEY_CAPTCHA);
+		cacheManager.put(CACHE_PREFIX_ANSWER + token, answer, -1, CACHE_ANSWER_TIME_TO_LIVE, TimeUnit.SECONDS,
+				KEY_CAPTCHA);
 		return challenge;
 	}
 
@@ -81,8 +80,7 @@ public class DefaultCaptchaManager implements CaptchaManager {
 
 	@Override
 	public void addCaptachaThreshold(HttpServletRequest request) {
-		boolean added = request
-				.getAttribute(REQUEST_ATTRIBUTE_KEY_CAPTACHA_THRESHOLD_ADDED) != null;
+		boolean added = request.getAttribute(REQUEST_ATTRIBUTE_KEY_CAPTACHA_THRESHOLD_ADDED) != null;
 		if (!added) {
 			String key = getThresholdKey(request);
 			Integer threshold = (Integer) cacheManager.get(key, KEY_CAPTCHA);
@@ -90,34 +88,25 @@ public class DefaultCaptchaManager implements CaptchaManager {
 				threshold += 1;
 			else
 				threshold = 1;
-			cacheManager.put(key, threshold, -1, CACHE_THRESHOLD_TIME_TO_LIVE,
-					TimeUnit.SECONDS, KEY_CAPTCHA);
-			request.setAttribute(
-					REQUEST_ATTRIBUTE_KEY_CAPTACHA_THRESHOLD_ADDED, true);
+			cacheManager.put(key, threshold, -1, CACHE_THRESHOLD_TIME_TO_LIVE, TimeUnit.SECONDS, KEY_CAPTCHA);
+			request.setAttribute(REQUEST_ATTRIBUTE_KEY_CAPTACHA_THRESHOLD_ADDED, true);
 		}
 
 	}
 
 	@Override
-	public boolean[] isCaptchaRequired(HttpServletRequest request,
-			Captcha captcha) {
-		boolean[] required = (boolean[]) request
-				.getAttribute(REQUEST_ATTRIBUTE_KEY_CAPTACHA_REQUIRED);
+	public boolean[] isCaptchaRequired(HttpServletRequest request, Captcha captcha) {
+		boolean[] required = (boolean[]) request.getAttribute(REQUEST_ATTRIBUTE_KEY_CAPTACHA_REQUIRED);
 		if (required == null) {
 			if (captcha != null) {
 				if (captcha.always()) {
 					required = new boolean[] { true, false };
 				} else if (captcha.bypassLoggedInUser()) {
-					required = new boolean[] {
-							AuthzUtils.getUserDetails() == null, false };
+					required = new boolean[] { AuthzUtils.getUserDetails() == null, false };
 				} else {
-					Integer threshold = (Integer) cacheManager.get(
-							getThresholdKey(request), KEY_CAPTCHA);
+					Integer threshold = (Integer) cacheManager.get(getThresholdKey(request), KEY_CAPTCHA);
 					if (threshold != null && threshold >= captcha.threshold()) {
-						required = new boolean[] {
-								true,
-								(threshold > 0 && threshold == captcha
-										.threshold()) };
+						required = new boolean[] { true, (threshold > 0 && threshold == captcha.threshold()) };
 					} else {
 						required = new boolean[] { false, false };
 					}
@@ -125,20 +114,16 @@ public class DefaultCaptchaManager implements CaptchaManager {
 			} else {
 				required = new boolean[] { false, false };
 			}
-			request.setAttribute(REQUEST_ATTRIBUTE_KEY_CAPTACHA_REQUIRED,
-					required);
+			request.setAttribute(REQUEST_ATTRIBUTE_KEY_CAPTACHA_REQUIRED, required);
 		}
 		return required;
 	}
 
 	@Override
-	public boolean verify(HttpServletRequest request, String token,
-			boolean cleanup) {
-		Boolean pass = (Boolean) request
-				.getAttribute(REQUEST_ATTRIBUTE_KEY_CAPTACHA_VALIDATED);
+	public boolean verify(HttpServletRequest request, String token, boolean cleanup) {
+		Boolean pass = (Boolean) request.getAttribute(REQUEST_ATTRIBUTE_KEY_CAPTACHA_VALIDATED);
 		if (pass == null) {
-			String answer = (String) cacheManager.get(CACHE_PREFIX_ANSWER
-					+ token, KEY_CAPTCHA);
+			String answer = (String) cacheManager.get(CACHE_PREFIX_ANSWER + token, KEY_CAPTCHA);
 			pass = verify(request.getParameter(KEY_CAPTCHA), answer);
 			request.setAttribute(REQUEST_ATTRIBUTE_KEY_CAPTACHA_VALIDATED, pass);
 		}

@@ -48,8 +48,7 @@ public class AccessFilter implements Filter {
 
 	public static final boolean DEFAULT_PRINT = true;
 
-	@Value("${accessFilter.responseTimeThreshold:"
-			+ DEFAULT_RESPONSETIMETHRESHOLD + "}")
+	@Value("${accessFilter.responseTimeThreshold:" + DEFAULT_RESPONSETIMETHRESHOLD + "}")
 	public long responseTimeThreshold = DEFAULT_RESPONSETIMETHRESHOLD;
 
 	@Value("${accessFilter.print:" + DEFAULT_PRINT + "}")
@@ -85,8 +84,7 @@ public class AccessFilter implements Filter {
 	@PostConstruct
 	public void _init() {
 		if (StringUtils.isNotBlank(excludePatterns))
-			excludePatternsList = Arrays.asList(excludePatterns
-					.split("\\s*,\\s*"));
+			excludePatternsList = Arrays.asList(excludePatterns.split("\\s*,\\s*"));
 	}
 
 	@Override
@@ -95,11 +93,10 @@ public class AccessFilter implements Filter {
 	}
 
 	@Override
-	public void doFilter(ServletRequest req, ServletResponse resp,
-			FilterChain chain) throws IOException, ServletException {
+	public void doFilter(ServletRequest req, ServletResponse resp, FilterChain chain)
+			throws IOException, ServletException {
 		boolean isRequestDispatcher = req.getDispatcherType() == DispatcherType.REQUEST;
-		HttpServletRequest request = new ProxySupportHttpServletRequest(
-				(HttpServletRequest) req);
+		HttpServletRequest request = new ProxySupportHttpServletRequest((HttpServletRequest) req);
 		HttpServletResponse response = (HttpServletResponse) resp;
 		if (isRequestDispatcher && RequestUtils.isInternalTesting(request))
 			response.addHeader("X-Instance-Id", AppInfo.getInstanceId());
@@ -108,8 +105,7 @@ public class AccessFilter implements Filter {
 		uri = uri.substring(request.getContextPath().length());
 
 		for (String pattern : excludePatternsList) {
-			if (org.ironrhino.core.util.StringUtils.matchesWildcard(uri,
-					pattern)) {
+			if (org.ironrhino.core.util.StringUtils.matchesWildcard(uri, pattern)) {
 				chain.doFilter(req, resp);
 				return;
 			}
@@ -121,8 +117,7 @@ public class AccessFilter implements Filter {
 				if (StringUtils.isNotBlank(excludePattern)) {
 					String[] arr = excludePattern.split("\\s*,\\s*");
 					for (String pa : arr)
-						if (org.ironrhino.core.util.StringUtils
-								.matchesWildcard(uri, pa)) {
+						if (org.ironrhino.core.util.StringUtils.matchesWildcard(uri, pa)) {
 							continue loop;
 						}
 				}
@@ -131,8 +126,7 @@ public class AccessFilter implements Filter {
 				if (!matched) {
 					String[] arr = pattern.split("\\s*,\\s*");
 					for (String pa : arr)
-						if (org.ironrhino.core.util.StringUtils
-								.matchesWildcard(uri, pa)) {
+						if (org.ironrhino.core.util.StringUtils.matchesWildcard(uri, pa)) {
 							matched = true;
 							break;
 						}
@@ -145,8 +139,7 @@ public class AccessFilter implements Filter {
 			}
 
 		if (request.getAttribute("userAgent") == null)
-			request.setAttribute("userAgent",
-					new UserAgent(request.getHeader("User-Agent")));
+			request.setAttribute("userAgent", new UserAgent(request.getHeader("User-Agent")));
 		MDC.put("remoteAddr", request.getRemoteAddr());
 		MDC.put("method", request.getMethod());
 		StringBuffer url = request.getRequestURL();
@@ -159,8 +152,7 @@ public class AccessFilter implements Filter {
 		s = request.getHeader("Referer");
 		if (s != null)
 			MDC.put("referer", " Referer:" + s);
-		s = RequestUtils.getCookieValue(request,
-				DefaultAuthenticationSuccessHandler.COOKIE_NAME_LOGIN_USER);
+		s = RequestUtils.getCookieValue(request, DefaultAuthenticationSuccessHandler.COOKIE_NAME_LOGIN_USER);
 		MDC.put("username", s != null ? " " + s : " ");
 		String sessionId = null;
 		if (httpSessionManager != null) {
@@ -176,8 +168,7 @@ public class AccessFilter implements Filter {
 			if (StringUtils.isBlank(requestId)) {
 				requestId = CodecUtils.nextId();
 				if (sessionId != null) {
-					requestId = new StringBuilder(sessionId).append('.')
-							.append(requestId).toString();
+					requestId = new StringBuilder(sessionId).append('.').append(requestId).toString();
 				}
 				response.setHeader(HTTP_HEADER_REQUEST_ID, requestId);
 			}
@@ -186,8 +177,7 @@ public class AccessFilter implements Filter {
 		MDC.put("request", " request:" + requestId);
 		MDC.put(MDC_KEY_REQUEST_ID, requestId);
 		try {
-			if (isRequestDispatcher && print && !uri.startsWith("/assets/")
-					&& !uri.startsWith("/remoting/")
+			if (isRequestDispatcher && print && !uri.startsWith("/assets/") && !uri.startsWith("/remoting/")
 					&& request.getHeader("Last-Event-Id") == null)
 				accessLog.info("");
 
@@ -196,8 +186,7 @@ public class AccessFilter implements Filter {
 			long responseTime = System.currentTimeMillis() - start;
 			if (isRequestDispatcher && responseTime > responseTimeThreshold) {
 				StringBuilder sb = new StringBuilder();
-				sb.append(RequestUtils.serializeData(request))
-						.append(" response time:").append(responseTime)
+				sb.append(RequestUtils.serializeData(request)).append(" response time:").append(responseTime)
 						.append("ms");
 				accesWarnLog.warn(sb.toString());
 			}

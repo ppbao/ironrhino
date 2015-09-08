@@ -29,8 +29,7 @@ public class ApiDocHelper {
 
 	private static ClassPool classPool = ClassPool.getDefault();
 
-	public static List<Method> findApiMethods(Class<?> apiDocClass)
-			throws Exception {
+	public static List<Method> findApiMethods(Class<?> apiDocClass) throws Exception {
 		List<Method> methods = new ArrayList<>();
 		for (Method m : apiDocClass.getMethods()) {
 			if (m.getAnnotation(Api.class) == null)
@@ -51,13 +50,9 @@ public class ApiDocHelper {
 						classPool.insertClassPath(new ClassClassPath(types[i]));
 						paramTypes[i] = classPool.get(types[i].getName());
 					}
-					classPool.insertClassPath(new ClassClassPath(o1
-							.getReturnType()));
-					CtMethod method1 = cc.getMethod(
-							o1.getName(),
-							Descriptor.ofMethod(
-									classPool.get(o1.getReturnType().getName()),
-									paramTypes));
+					classPool.insertClassPath(new ClassClassPath(o1.getReturnType()));
+					CtMethod method1 = cc.getMethod(o1.getName(),
+							Descriptor.ofMethod(classPool.get(o1.getReturnType().getName()), paramTypes));
 					line1 = method1.getMethodInfo().getLineNumber(0);
 					types = o2.getParameterTypes();
 					paramTypes = new CtClass[types.length];
@@ -65,13 +60,9 @@ public class ApiDocHelper {
 						classPool.insertClassPath(new ClassClassPath(types[i]));
 						paramTypes[i] = classPool.get(types[i].getName());
 					}
-					classPool.insertClassPath(new ClassClassPath(o2
-							.getReturnType()));
-					CtMethod method2 = cc.getMethod(
-							o2.getName(),
-							Descriptor.ofMethod(
-									classPool.get(o2.getReturnType().getName()),
-									paramTypes));
+					classPool.insertClassPath(new ClassClassPath(o2.getReturnType()));
+					CtMethod method2 = cc.getMethod(o2.getName(),
+							Descriptor.ofMethod(classPool.get(o2.getReturnType().getName()), paramTypes));
 					line2 = method2.getMethodInfo().getLineNumber(0);
 				} catch (Exception e) {
 					e.printStackTrace();
@@ -88,8 +79,7 @@ public class ApiDocHelper {
 
 	public static List<ApiModuleObject> getApiModules(String[] basePackages) {
 		ObjectMapper objectMapper = ApiConfigBase.createObjectMapper();
-		Collection<Class<?>> classes = ClassScanner.scanAnnotated(basePackages,
-				ApiModule.class);
+		Collection<Class<?>> classes = ClassScanner.scanAnnotated(basePackages, ApiModule.class);
 		List<ApiModuleObject> list = new ArrayList<>();
 		for (Class<?> clazz : classes) {
 			ApiModule apiModule = clazz.getAnnotation(ApiModule.class);
@@ -111,8 +101,7 @@ public class ApiDocHelper {
 			try {
 				List<Method> methods = findApiMethods(clazz);
 				for (Method m : methods)
-					apiModuleObject.getApiDocs().add(
-							new ApiDoc(clazz, m, objectMapper));
+					apiModuleObject.getApiDocs().add(new ApiDoc(clazz, m, objectMapper));
 			} catch (Exception e) {
 				e.printStackTrace();
 			}
@@ -120,28 +109,23 @@ public class ApiDocHelper {
 		return list;
 	}
 
-	public static Object generateSample(Object apiDocInstance,
-			Method apiDocMethod, Fields fields) throws Exception {
+	public static Object generateSample(Object apiDocInstance, Method apiDocMethod, Fields fields) throws Exception {
 		if (fields != null) {
 			if (StringUtils.isNotBlank(fields.sample()))
 				return fields.sample();
 			String sampleFileName = fields.sampleFileName();
 			if (StringUtils.isNotBlank(sampleFileName)) {
-				try (InputStream is = apiDocInstance.getClass()
-						.getResourceAsStream(sampleFileName)) {
+				try (InputStream is = apiDocInstance.getClass().getResourceAsStream(sampleFileName)) {
 					if (is == null) {
-						throw new ErrorMessage(sampleFileName + " with "
-								+ apiDocInstance.getClass().getName()
-								+ " is not found!");
+						throw new ErrorMessage(
+								sampleFileName + " with " + apiDocInstance.getClass().getName() + " is not found!");
 					}
-					return StringUtils.join(IOUtils.readLines(is, "UTF-8"),
-							"\n");
+					return StringUtils.join(IOUtils.readLines(is, "UTF-8"), "\n");
 				}
 			}
 			String sampleMethodName = fields.sampleMethodName();
 			if (StringUtils.isNotBlank(sampleMethodName)) {
-				Method m = apiDocInstance.getClass().getDeclaredMethod(
-						sampleMethodName, new Class[0]);
+				Method m = apiDocInstance.getClass().getDeclaredMethod(sampleMethodName, new Class[0]);
 				m.setAccessible(true);
 				return m.invoke(apiDocInstance, new Object[0]);
 			}

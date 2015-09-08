@@ -49,16 +49,13 @@ public abstract class RabbitTopic<T extends Serializable> implements Topic<T> {
 
 	@PostConstruct
 	public void init() {
-		rabbitAdmin
-				.declareExchange(new TopicExchange(exchangeName, true, false));
+		rabbitAdmin.declareExchange(new TopicExchange(exchangeName, true, false));
 		Queue queue = rabbitAdmin.declareQueue();
 		queueName = queue.getName();
-		rabbitAdmin.declareBinding(new Binding(queueName,
-				DestinationType.QUEUE, exchangeName,
-				getRoutingKey(Scope.GLOBAL), null));
-		rabbitAdmin.declareBinding(new Binding(queueName,
-				DestinationType.QUEUE, exchangeName,
-				getRoutingKey(Scope.APPLICATION), null));
+		rabbitAdmin.declareBinding(
+				new Binding(queueName, DestinationType.QUEUE, exchangeName, getRoutingKey(Scope.GLOBAL), null));
+		rabbitAdmin.declareBinding(
+				new Binding(queueName, DestinationType.QUEUE, exchangeName, getRoutingKey(Scope.APPLICATION), null));
 	}
 
 	@PreDestroy
@@ -89,8 +86,7 @@ public abstract class RabbitTopic<T extends Serializable> implements Topic<T> {
 			else
 				task.run();
 		} else {
-			amqpTemplate.convertAndSend(exchangeName, getRoutingKey(scope),
-					message);
+			amqpTemplate.convertAndSend(exchangeName, getRoutingKey(scope), message);
 		}
 	}
 }

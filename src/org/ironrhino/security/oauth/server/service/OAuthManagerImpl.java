@@ -81,8 +81,7 @@ public class OAuthManagerImpl implements OAuthManager {
 	}
 
 	@Override
-	public Authorization generate(Client client, String redirectUri,
-			String scope, String responseType) {
+	public Authorization generate(Client client, String redirectUri, String scope, String responseType) {
 		if (!client.supportsRedirectUri(redirectUri))
 			throw new IllegalArgumentException("redirect_uri_mismatch");
 		Authorization auth = new Authorization();
@@ -151,8 +150,7 @@ public class OAuthManagerImpl implements OAuthManager {
 
 	@Override
 	public Authorization retrieve(String accessToken) {
-		Authorization auth = authorizationManager
-				.findByAccessToken(accessToken);
+		Authorization auth = authorizationManager.findByAccessToken(accessToken);
 		return auth;
 	}
 
@@ -163,8 +161,7 @@ public class OAuthManagerImpl implements OAuthManager {
 			throw new IllegalArgumentException("client_id_not_exists");
 		if (!orig.getSecret().equals(client.getSecret()))
 			throw new IllegalArgumentException("client_secret_mismatch");
-		Authorization auth = authorizationManager.findOne("refreshToken",
-				refreshToken);
+		Authorization auth = authorizationManager.findOne("refreshToken", refreshToken);
 		if (auth == null)
 			throw new IllegalArgumentException("invalid_token");
 		auth.setAccessToken(CodecUtils.nextId());
@@ -199,10 +196,8 @@ public class OAuthManagerImpl implements OAuthManager {
 	public void removeExpired() {
 		Calendar cal = Calendar.getInstance();
 		cal.add(Calendar.SECOND, (int) (-expireTime));
-		authorizationManager
-				.executeUpdate(
-						"delete from Authorization a where lifetime >0 and a.modifyDate < ?1",
-						cal.getTime());
+		authorizationManager.executeUpdate("delete from Authorization a where lifetime >0 and a.modifyDate < ?1",
+				cal.getTime());
 	}
 
 	@Override

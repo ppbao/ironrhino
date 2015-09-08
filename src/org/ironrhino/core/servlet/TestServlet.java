@@ -55,8 +55,8 @@ public class TestServlet extends HttpServlet {
 		logger.info("testing: " + testurl);
 		HttpRequestBase httpRequest = new HttpGet(testurl);
 		try {
-			return HttpClientUtils.getDefaultInstance().execute(httpRequest)
-					.getStatusLine().getStatusCode() == HttpServletResponse.SC_OK;
+			return HttpClientUtils.getDefaultInstance().execute(httpRequest).getStatusLine()
+					.getStatusCode() == HttpServletResponse.SC_OK;
 		} catch (Exception e) {
 			httpRequest.abort();
 			return false;

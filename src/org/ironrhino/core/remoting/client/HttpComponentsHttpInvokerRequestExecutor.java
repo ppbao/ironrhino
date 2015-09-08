@@ -27,8 +27,7 @@ import org.springframework.remoting.httpinvoker.HttpInvokerClientConfiguration;
 import org.springframework.remoting.support.RemoteInvocationResult;
 import org.springframework.util.StringUtils;
 
-public class HttpComponentsHttpInvokerRequestExecutor extends
-		AbstractHttpInvokerRequestExecutor {
+public class HttpComponentsHttpInvokerRequestExecutor extends AbstractHttpInvokerRequestExecutor {
 
 	private CloseableHttpClient httpClient;
 
@@ -64,14 +63,11 @@ public class HttpComponentsHttpInvokerRequestExecutor extends
 
 	@PostConstruct
 	public void init() {
-		httpClient = HttpClients.custom().disableAuthCaching()
-				.disableConnectionState().disableCookieManagement()
-				.disableRedirectHandling().setMaxConnPerRoute(maxConnPerRoute)
-				.setMaxConnTotal(maxConnTotal)
+		httpClient = HttpClients.custom().disableAuthCaching().disableConnectionState().disableCookieManagement()
+				.disableRedirectHandling().setMaxConnPerRoute(maxConnPerRoute).setMaxConnTotal(maxConnTotal)
 				.setRetryHandler(new HttpRequestRetryHandler() {
 					@Override
-					public boolean retryRequest(IOException ex,
-							int executionCount, HttpContext context) {
+					public boolean retryRequest(IOException ex, int executionCount, HttpContext context) {
 						if (executionCount > 3)
 							return false;
 						if (ex instanceof NoHttpResponseException)
@@ -82,8 +78,7 @@ public class HttpComponentsHttpInvokerRequestExecutor extends
 	}
 
 	@Override
-	protected RemoteInvocationResult doExecuteRequest(
-			HttpInvokerClientConfiguration config, ByteArrayOutputStream baos)
+	protected RemoteInvocationResult doExecuteRequest(HttpInvokerClientConfiguration config, ByteArrayOutputStream baos)
 			throws IOException, ClassNotFoundException {
 		HttpPost postMethod = new HttpPost(config.getServiceUrl());
 		postMethod.setHeader(HTTP_HEADER_CONTENT_TYPE, getContentType());
@@ -91,29 +86,24 @@ public class HttpComponentsHttpInvokerRequestExecutor extends
 		if (localeContext != null) {
 			Locale locale = localeContext.getLocale();
 			if (locale != null)
-				postMethod.setHeader(HTTP_HEADER_ACCEPT_LANGUAGE,
-						StringUtils.toLanguageTag(locale));
+				postMethod.setHeader(HTTP_HEADER_ACCEPT_LANGUAGE, StringUtils.toLanguageTag(locale));
 		}
 		if (isAcceptGzipEncoding())
 			postMethod.setHeader(HTTP_HEADER_ACCEPT_ENCODING, ENCODING_GZIP);
 		String requestId = MDC.get(AccessFilter.MDC_KEY_REQUEST_ID);
 		if (requestId != null)
-			postMethod
-					.addHeader(AccessFilter.HTTP_HEADER_REQUEST_ID, requestId);
+			postMethod.addHeader(AccessFilter.HTTP_HEADER_REQUEST_ID, requestId);
 		postMethod.setEntity(new ByteArrayEntity(baos.toByteArray()));
 		CloseableHttpResponse rsp = httpClient.execute(postMethod);
 		try {
 			StatusLine sl = rsp.getStatusLine();
 			if (sl.getStatusCode() >= 300) {
-				throw new IOException(
-						"Did not receive successful HTTP response: status code = "
-								+ sl.getStatusCode() + ", status message = ["
-								+ sl.getReasonPhrase() + "]");
+				throw new IOException("Did not receive successful HTTP response: status code = " + sl.getStatusCode()
+						+ ", status message = [" + sl.getReasonPhrase() + "]");
 			}
 			HttpEntity entity = rsp.getEntity();
 			InputStream responseBody = entity.getContent();
-			return readRemoteInvocationResult(responseBody,
-					config.getCodebaseUrl());
+			return readRemoteInvocationResult(responseBody, config.getCodebaseUrl());
 		} finally {
 			rsp.close();
 			postMethod.releaseConnection();

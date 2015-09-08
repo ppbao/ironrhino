@@ -35,8 +35,7 @@ public class RedisMembership implements Membership {
 
 	private RedisTemplate<String, String> stringRedisTemplate;
 
-	private Set<String> groups = Collections
-			.newSetFromMap(new ConcurrentHashMap<String, Boolean>());
+	private Set<String> groups = Collections.newSetFromMap(new ConcurrentHashMap<String, Boolean>());
 
 	@Autowired
 	private TaskScheduler taskScheduler;
@@ -45,8 +44,7 @@ public class RedisMembership implements Membership {
 	private int heartbeat = 60000;
 
 	@Autowired
-	public RedisMembership(
-			@Qualifier("stringRedisTemplate") RedisTemplate<String, String> stringRedisTemplate) {
+	public RedisMembership(@Qualifier("stringRedisTemplate") RedisTemplate<String, String> stringRedisTemplate) {
 		this.stringRedisTemplate = stringRedisTemplate;
 	}
 
@@ -59,19 +57,15 @@ public class RedisMembership implements Membership {
 					List<String> members = getMembers(group);
 					String self = AppInfo.getInstanceId();
 					if (!members.contains(self))
-						stringRedisTemplate.opsForList().rightPush(
-								NAMESPACE + group, self);
+						stringRedisTemplate.opsForList().rightPush(NAMESPACE + group, self);
 					for (String member : members) {
 						if (member.equals(self))
 							continue;
 						boolean alive = false;
-						String url = new StringBuilder("http://")
-								.append(member.substring(member
-										.lastIndexOf('@') + 1))
+						String url = new StringBuilder("http://").append(member.substring(member.lastIndexOf('@') + 1))
 								.append("/_ping?_internal_testing_").toString();
 						try {
-							HttpURLConnection conn = (HttpURLConnection) new URL(
-									url).openConnection();
+							HttpURLConnection conn = (HttpURLConnection) new URL(url).openConnection();
 							conn.setConnectTimeout(3000);
 							conn.setReadTimeout(2000);
 							conn.setInstanceFollowRedirects(false);
@@ -87,18 +81,11 @@ public class RedisMembership implements Membership {
 									if (value.equals(member)) {
 										alive = true;
 									} else {
-										if (!members.contains(value)
-												&& value.length() <= 100
+										if (!members.contains(value) && value.length() <= 100
 												&& value.matches("[\\w-]+@[\\w.:]+")) {
-											if (AppInfo.getAppName().equals(
-													value.substring(0, value
-															.lastIndexOf('-')))) {
-												stringRedisTemplate
-														.opsForList()
-														.rightPush(
-																NAMESPACE
-																		+ group,
-																value);
+											if (AppInfo.getAppName()
+													.equals(value.substring(0, value.lastIndexOf('-')))) {
+												stringRedisTemplate.opsForList().rightPush(NAMESPACE + group, value);
 											} else {
 												// multiple virtual host
 												alive = true;
@@ -111,8 +98,7 @@ public class RedisMembership implements Membership {
 						} catch (IOException e) {
 						}
 						if (!alive)
-							stringRedisTemplate.opsForList().remove(
-									NAMESPACE + group, 0, member);
+							stringRedisTemplate.opsForList().remove(NAMESPACE + group, 0, member);
 					}
 				}
 			}
@@ -121,15 +107,13 @@ public class RedisMembership implements Membership {
 
 	@Override
 	public void join(final String group) {
-		stringRedisTemplate.opsForList().leftPush(NAMESPACE + group,
-				AppInfo.getInstanceId());
+		stringRedisTemplate.opsForList().leftPush(NAMESPACE + group, AppInfo.getInstanceId());
 		groups.add(group);
 	}
 
 	@Override
 	public void leave(final String group) {
-		stringRedisTemplate.opsForList().remove(NAMESPACE + group, 0,
-				AppInfo.getInstanceId());
+		stringRedisTemplate.opsForList().remove(NAMESPACE + group, 0, AppInfo.getInstanceId());
 		groups.remove(group);
 	}
 

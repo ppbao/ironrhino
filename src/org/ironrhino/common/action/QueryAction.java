@@ -121,8 +121,7 @@ public class QueryAction extends BaseAction {
 			HttpServletResponse response = ServletActionContext.getResponse();
 			response.setCharacterEncoding(csvDefaultEncoding);
 			response.setHeader("Content-type", "text/csv");
-			response.setHeader("Content-disposition",
-					"attachment;filename=data.csv");
+			response.setHeader("Content-disposition", "attachment;filename=data.csv");
 			final PrintWriter writer = response.getWriter();
 			jdbcQueryService.query(sql, paramMap, new LineHandler() {
 				@Override
