@@ -13,20 +13,18 @@ import org.hibernate.criterion.DetachedCriteria;
 import org.hibernate.criterion.Order;
 import org.hibernate.criterion.Restrictions;
 import org.ironrhino.core.metadata.Trigger;
-import org.ironrhino.core.spring.configuration.ResourcePresentConditional;
+import org.ironrhino.core.spring.configuration.ServiceImplementationConditional;
 import org.ironrhino.core.util.CodecUtils;
 import org.ironrhino.security.oauth.server.model.Authorization;
 import org.ironrhino.security.oauth.server.model.Client;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
-import org.springframework.context.annotation.Profile;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.stereotype.Component;
 
 @Component("oauthManager")
-@Profile({ DEFAULT, DUAL, CLOUD })
-@ResourcePresentConditional(value = "resources/spring/applicationContext-oauth.xml", negated = true)
+@ServiceImplementationConditional(profiles = { DEFAULT, DUAL, CLOUD })
 public class OAuthManagerImpl implements OAuthManager {
 
 	@Autowired

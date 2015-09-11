@@ -15,7 +15,7 @@ import org.hibernate.criterion.DetachedCriteria;
 import org.hibernate.criterion.Order;
 import org.hibernate.criterion.Restrictions;
 import org.ironrhino.core.service.EntityManager;
-import org.ironrhino.core.spring.configuration.ResourcePresentConditional;
+import org.ironrhino.core.spring.configuration.ServiceImplementationConditional;
 import org.ironrhino.core.util.CodecUtils;
 import org.ironrhino.core.util.JsonUtils;
 import org.ironrhino.security.oauth.server.model.Authorization;
@@ -25,15 +25,13 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.beans.factory.annotation.Value;
-import org.springframework.context.annotation.Profile;
 import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.stereotype.Component;
 
 @Component("oauthManager")
-@Profile(CLUSTER)
+@ServiceImplementationConditional(profiles = CLUSTER)
 @SuppressWarnings({ "rawtypes" })
-@ResourcePresentConditional(value = "resources/spring/applicationContext-oauth.xml", negated = true)
 public class HybirdOAuthManagerImpl implements OAuthManager {
 
 	private Logger logger = LoggerFactory.getLogger(getClass());
