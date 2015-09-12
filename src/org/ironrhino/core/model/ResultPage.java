@@ -10,7 +10,7 @@ import java.util.Map;
 import javax.servlet.http.HttpServletRequest;
 
 import org.apache.commons.lang3.StringUtils;
-import org.apache.struts2.ServletActionContext;
+import org.ironrhino.core.servlet.RequestContext;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
 
@@ -195,7 +195,7 @@ public class ResultPage<T> implements Serializable {
 	}
 
 	public String renderUrl(int pn) {
-		HttpServletRequest request = ServletActionContext.getRequest();
+		HttpServletRequest request = RequestContext.getRequest();
 		String requestURI = (String) request.getAttribute("struts.request_uri");
 		if (requestURI == null)
 			requestURI = (String) request.getAttribute("javax.servlet.forward.request_uri");
@@ -227,7 +227,7 @@ public class ResultPage<T> implements Serializable {
 	private String _getParameterString() {
 		if (_parameterString == null) {
 			StringBuilder sb = new StringBuilder();
-			Map<String, String[]> map = ServletActionContext.getRequest().getParameterMap();
+			Map<String, String[]> map = RequestContext.getRequest().getParameterMap();
 			for (Map.Entry<String, String[]> entry : map.entrySet()) {
 				String name = entry.getKey();
 				String[] values = entry.getValue();

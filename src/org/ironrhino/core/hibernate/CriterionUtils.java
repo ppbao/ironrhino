@@ -6,7 +6,6 @@ import java.util.Map;
 import java.util.Set;
 
 import org.apache.commons.lang3.StringUtils;
-import org.apache.struts2.ServletActionContext;
 import org.hibernate.annotations.NaturalId;
 import org.hibernate.criterion.Criterion;
 import org.hibernate.criterion.DetachedCriteria;
@@ -15,6 +14,7 @@ import org.hibernate.criterion.Order;
 import org.hibernate.criterion.Restrictions;
 import org.ironrhino.core.model.Persistable;
 import org.ironrhino.core.service.BaseManager;
+import org.ironrhino.core.servlet.RequestContext;
 import org.ironrhino.core.struts.AnnotationShadows.UiConfigImpl;
 import org.ironrhino.core.struts.EntityClassHelper;
 import org.ironrhino.core.util.AnnotationUtils;
@@ -110,7 +110,7 @@ public class CriterionUtils {
 
 	public static CriteriaState filter(DetachedCriteria dc, Class<? extends Persistable<?>> entityClass,
 			Map<String, UiConfigImpl> uiConfigs) {
-		Map<String, String[]> parameterMap = ServletActionContext.getRequest().getParameterMap();
+		Map<String, String[]> parameterMap = RequestContext.getRequest().getParameterMap();
 		String entityName = StringUtils.uncapitalize(entityClass.getSimpleName());
 		Set<String> propertyNames = uiConfigs.keySet();
 		CriteriaState state = new CriteriaState();
@@ -183,8 +183,7 @@ public class CriterionUtils {
 				} else {
 					propertyName = parameterName;
 					parameterValues = parameterMap.get(parameterName);
-					operatorValue = ServletActionContext.getRequest()
-							.getParameter(parameterName + CRITERION_OPERATOR_SUFFIX);
+					operatorValue = RequestContext.getRequest().getParameter(parameterName + CRITERION_OPERATOR_SUFFIX);
 				}
 				if (propertyName.startsWith(entityName + "."))
 					propertyName = propertyName.substring(propertyName.indexOf('.') + 1);
