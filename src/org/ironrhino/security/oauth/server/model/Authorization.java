@@ -4,6 +4,8 @@ import java.util.Date;
 
 import javax.persistence.Column;
 import javax.persistence.Entity;
+import javax.persistence.EnumType;
+import javax.persistence.Enumerated;
 import javax.persistence.Table;
 
 import org.hibernate.annotations.NaturalId;
@@ -34,7 +36,7 @@ public class Authorization extends BaseEntity {
 
 	private static final long serialVersionUID = -559379341059695550L;
 
-	@UiConfig(width = "200px", alias = "access_token")
+	@UiConfig(width = "180px", alias = "access_token")
 	@CaseInsensitive
 	@NaturalId(mutable = true)
 	private String accessToken = CodecUtils.nextId();
@@ -52,16 +54,25 @@ public class Authorization extends BaseEntity {
 	@Column(unique = true)
 	private String code;
 
-	@UiConfig(width = "100px")
+	@UiConfig(width = "60px")
 	private int lifetime = DEFAULT_LIFETIME;
 
 	@UiConfig(hiddenInList = @Hidden(true) , alias = "refresh_token")
 	@Column(unique = true)
 	private String refreshToken;
 
-	@UiConfig(width = "100px", alias = "response_type")
-	@Column(nullable = false)
-	private String responseType = "code";
+	@UiConfig(hiddenInList = @Hidden(true) , alias = "response_type")
+	@Column(nullable = false, length = 10)
+	@Enumerated(EnumType.STRING)
+	private ResponseType responseType = ResponseType.code;
+
+	@UiConfig(width = "120px", alias = "grant_type")
+	@Column(length = 20)
+	@Enumerated(EnumType.STRING)
+	private GrantType grantType = GrantType.authorization_code;
+
+	@UiConfig(width = "130px")
+	private String address;
 
 	@NotInCopy
 	@UiConfig(width = "130px")
@@ -150,17 +161,33 @@ public class Authorization extends BaseEntity {
 		this.code = code;
 	}
 
-	public String getResponseType() {
+	public ResponseType getResponseType() {
 		return responseType;
 	}
 
-	public void setResponseType(String responseType) {
+	public void setResponseType(ResponseType responseType) {
 		this.responseType = responseType;
+	}
+
+	public GrantType getGrantType() {
+		return grantType;
+	}
+
+	public void setGrantType(GrantType grantType) {
+		this.grantType = grantType;
+	}
+
+	public String getAddress() {
+		return address;
+	}
+
+	public void setAddress(String address) {
+		this.address = address;
 	}
 
 	@JsonIgnore
 	public boolean isClientSide() {
-		return "token".equals(responseType);
+		return ResponseType.token == responseType;
 	}
 
 }

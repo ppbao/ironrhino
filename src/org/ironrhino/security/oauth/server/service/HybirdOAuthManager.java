@@ -1,37 +1,48 @@
 package org.ironrhino.security.oauth.server.service;
 
+import static org.ironrhino.core.metadata.Profiles.CLUSTER;
+
 import java.util.ArrayList;
 import java.util.Collections;
-import java.util.Comparator;
 import java.util.Date;
 import java.util.List;
-import java.util.Set;
 import java.util.concurrent.TimeUnit;
 
+import javax.annotation.Resource;
+
 import org.apache.commons.lang3.StringUtils;
+import org.hibernate.criterion.DetachedCriteria;
+import org.hibernate.criterion.Order;
+import org.hibernate.criterion.Restrictions;
+import org.ironrhino.core.service.EntityManager;
+import org.ironrhino.core.servlet.RequestContext;
+import org.ironrhino.core.spring.configuration.ServiceImplementationConditional;
 import org.ironrhino.core.util.CodecUtils;
 import org.ironrhino.core.util.JsonUtils;
 import org.ironrhino.security.oauth.server.model.Authorization;
 import org.ironrhino.security.oauth.server.model.Client;
+import org.ironrhino.security.oauth.server.model.GrantType;
+import org.ironrhino.security.oauth.server.model.ResponseType;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
-import org.springframework.beans.factory.annotation.Value;
 import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.security.core.userdetails.UserDetails;
+import org.springframework.stereotype.Component;
 
-public class RedisOAuthManagerImpl implements OAuthManager {
+@Component("oauthManager")
+@ServiceImplementationConditional(profiles = CLUSTER)
+@SuppressWarnings({ "rawtypes" })
+public class HybirdOAuthManager extends AbstractOAuthManager {
 
 	private Logger logger = LoggerFactory.getLogger(getClass());
 
-	@Value("${oauth.authorization.lifetime:0}")
-	private int authorizationLifetime;
+	@Autowired
+	private ClientManager clientManager;
 
-	@Value("${oauth.authorization.expireTime:" + DEFAULT_EXPIRE_TIME + "}")
-	private long expireTime;
-
-	private RedisTemplate<String, Client> clientRedisTemplate;
+	@Resource
+	private EntityManager entityManager;
 
 	@Autowired
 	@Qualifier("stringRedisTemplate")
@@ -40,30 +51,14 @@ public class RedisOAuthManagerImpl implements OAuthManager {
 	private static final String NAMESPACE_AUTHORIZATION = "oauth:authorization:";
 	private static final String NAMESPACE_AUTHORIZATION_GRANTOR = "oauth:authorization:grantor:";
 
-	private static final String NAMESPACE_CLIENT = "oauth:client:";
-	private static final String NAMESPACE_CLIENT_OWNER = "oauth:client:owner:";
-
 	// oauth:authorization:{id} -> authorization
 	// oauth:authorization:{code} -> id
 	// oauth:authorization:{accessToken} -> id
 	// oauth:authorization:{refreshToken} -> id
 	// oauth:authorization:grantor:{username} -> [id]
 
-	@SuppressWarnings({ "unchecked", "rawtypes" })
-	@Autowired
-	public RedisOAuthManagerImpl(RedisTemplate redisTemplate,
-			@Qualifier("stringRedisTemplate") RedisTemplate<String, String> stringRedisTemplate) {
-		this.clientRedisTemplate = redisTemplate;
-		this.stringRedisTemplate = stringRedisTemplate;
-	}
-
 	public void setExpireTime(long expireTime) {
 		this.expireTime = expireTime;
-	}
-
-	@Override
-	public long getExpireTime() {
-		return expireTime;
 	}
 
 	@Override
@@ -79,7 +74,12 @@ public class RedisOAuthManagerImpl implements OAuthManager {
 		auth.setId(CodecUtils.nextId());
 		auth.setClient(client.getId());
 		auth.setRefreshToken(CodecUtils.nextId());
-		auth.setResponseType("token");
+		auth.setResponseType(ResponseType.token);
+		auth.setGrantType(GrantType.client_credential);
+		try {
+			auth.setAddress(RequestContext.getRequest().getRemoteAddr());
+		} catch (NullPointerException npe) {
+		}
 		stringRedisTemplate.opsForValue().set(NAMESPACE_AUTHORIZATION + auth.getId(), JsonUtils.toJson(auth),
 				expireTime, TimeUnit.SECONDS);
 		stringRedisTemplate.opsForValue().set(NAMESPACE_AUTHORIZATION + auth.getAccessToken(), auth.getId(),
@@ -90,15 +90,22 @@ public class RedisOAuthManagerImpl implements OAuthManager {
 	}
 
 	@Override
-	public Authorization grant(Client client, UserDetails grantor) {
+	public Authorization grant(Client client, String grantor) {
+		if (exclusive)
+			deleteAuthorizationsByGrantor(grantor, client.getId(), GrantType.password);
 		Authorization auth = new Authorization();
 		if (authorizationLifetime > 0)
 			auth.setLifetime(authorizationLifetime);
 		auth.setId(CodecUtils.nextId());
 		auth.setClient(client.getId());
-		auth.setGrantor(grantor.getUsername());
+		auth.setGrantor(grantor);
 		auth.setRefreshToken(CodecUtils.nextId());
-		auth.setResponseType("token");
+		auth.setResponseType(ResponseType.token);
+		auth.setGrantType(GrantType.password);
+		try {
+			auth.setAddress(RequestContext.getRequest().getRemoteAddr());
+		} catch (NullPointerException npe) {
+		}
 		stringRedisTemplate.opsForValue().set(NAMESPACE_AUTHORIZATION + auth.getId(), JsonUtils.toJson(auth),
 				expireTime, TimeUnit.SECONDS);
 		stringRedisTemplate.opsForValue().set(NAMESPACE_AUTHORIZATION + auth.getAccessToken(), auth.getId(),
@@ -110,7 +117,7 @@ public class RedisOAuthManagerImpl implements OAuthManager {
 	}
 
 	@Override
-	public Authorization generate(Client client, String redirectUri, String scope, String responseType) {
+	public Authorization generate(Client client, String redirectUri, String scope, ResponseType responseType) {
 		if (!client.supportsRedirectUri(redirectUri))
 			throw new IllegalArgumentException("redirect_uri_mismatch");
 		Authorization auth = new Authorization();
@@ -120,7 +127,7 @@ public class RedisOAuthManagerImpl implements OAuthManager {
 		auth.setClient(client.getId());
 		if (StringUtils.isNotBlank(scope))
 			auth.setScope(scope);
-		if (StringUtils.isNotBlank(responseType))
+		if (responseType != null)
 			auth.setResponseType(responseType);
 		stringRedisTemplate.opsForValue().set(NAMESPACE_AUTHORIZATION + auth.getId(), JsonUtils.toJson(auth),
 				expireTime, TimeUnit.SECONDS);
@@ -140,7 +147,7 @@ public class RedisOAuthManagerImpl implements OAuthManager {
 	}
 
 	@Override
-	public Authorization grant(String authorizationId, UserDetails grantor) {
+	public Authorization grant(String authorizationId, String grantor) {
 		String key = NAMESPACE_AUTHORIZATION + authorizationId;
 		Authorization auth = null;
 		try {
@@ -150,7 +157,11 @@ public class RedisOAuthManagerImpl implements OAuthManager {
 		}
 		if (auth == null)
 			throw new IllegalArgumentException("bad_auth");
-		auth.setGrantor(grantor.getUsername());
+		auth.setGrantor(grantor);
+		try {
+			auth.setAddress(RequestContext.getRequest().getRemoteAddr());
+		} catch (NullPointerException npe) {
+		}
 		auth.setModifyDate(new Date());
 		if (auth.isClientSide()) {
 			stringRedisTemplate.delete(key);
@@ -199,8 +210,11 @@ public class RedisOAuthManagerImpl implements OAuthManager {
 			throw new IllegalArgumentException("client_secret_mismatch");
 		if (!orig.supportsRedirectUri(client.getRedirectUri()))
 			throw new IllegalArgumentException("redirect_uri_mismatch");
+		if (exclusive)
+			deleteAuthorizationsByGrantor(auth.getGrantor(), client.getId(), GrantType.authorization_code);
 		auth.setCode(null);
 		auth.setRefreshToken(CodecUtils.nextId());
+		auth.setGrantType(GrantType.authorization_code);
 		auth.setModifyDate(new Date());
 		stringRedisTemplate.delete(key);
 		stringRedisTemplate.opsForValue().set(NAMESPACE_AUTHORIZATION + auth.getId(), JsonUtils.toJson(auth),
@@ -292,16 +306,16 @@ public class RedisOAuthManagerImpl implements OAuthManager {
 	}
 
 	@Override
-	public List<Authorization> findAuthorizationsByGrantor(UserDetails grantor) {
-		String keyForList = NAMESPACE_AUTHORIZATION_GRANTOR + grantor.getUsername();
+	public List<Authorization> findAuthorizationsByGrantor(String grantor) {
+		String keyForList = NAMESPACE_AUTHORIZATION_GRANTOR + grantor;
 		List<String> tokens = stringRedisTemplate.opsForList().range(keyForList, 0, -1);
 		if (tokens == null || tokens.isEmpty())
 			return Collections.emptyList();
-		List<String> keys = new ArrayList<String>(tokens.size());
+		List<String> keys = new ArrayList<>(tokens.size());
 		for (String token : tokens)
 			keys.add(NAMESPACE_AUTHORIZATION + token);
 		List<String> list = stringRedisTemplate.opsForValue().multiGet(keys);
-		List<Authorization> result = new ArrayList<Authorization>(list.size());
+		List<Authorization> result = new ArrayList<>(list.size());
 		for (String json : list) {
 			try {
 				result.add(JsonUtils.fromJson(json, Authorization.class));
@@ -312,48 +326,34 @@ public class RedisOAuthManagerImpl implements OAuthManager {
 		return result;
 	}
 
-	public void saveClient(Client client) {
-		if (client.isNew())
-			client.setId(CodecUtils.nextId());
-		clientRedisTemplate.opsForValue().set(NAMESPACE_CLIENT + client.getId(), client);
-		if (client.getOwner() != null)
-			stringRedisTemplate.opsForSet().add(NAMESPACE_CLIENT_OWNER + client.getOwner().getUsername(),
-					client.getId());
-	}
-
-	public void deleteClient(Client client) {
-		if (client.isNew())
-			return;
-		clientRedisTemplate.delete(NAMESPACE_CLIENT + client.getId());
-		if (client.getOwner() != null)
-			stringRedisTemplate.opsForSet().remove(NAMESPACE_CLIENT_OWNER + client.getOwner().getUsername(),
-					client.getId());
+	@Override
+	public void deleteAuthorizationsByGrantor(String grantor, String client, GrantType grantType) {
+		List<Authorization> list = findAuthorizationsByGrantor(grantor);
+		for (Authorization authorization : list)
+			if ((client == null || client.equals(authorization.getClient()))
+					&& (grantType == null || grantType == authorization.getGrantType())) {
+				stringRedisTemplate.delete(NAMESPACE_AUTHORIZATION + authorization.getId());
+				stringRedisTemplate.delete(NAMESPACE_AUTHORIZATION + authorization.getAccessToken());
+				stringRedisTemplate.delete(NAMESPACE_AUTHORIZATION + authorization.getRefreshToken());
+				stringRedisTemplate.opsForList().remove(NAMESPACE_AUTHORIZATION_GRANTOR + grantor, 0,
+						authorization.getId());
+			}
 	}
 
 	@Override
 	public Client findClientById(String clientId) {
 		if (StringUtils.isBlank(clientId))
 			return null;
-		Client c = clientRedisTemplate.opsForValue().get(NAMESPACE_CLIENT + clientId);
+		Client c = clientManager.get(clientId);
 		return c != null && c.isEnabled() ? c : null;
 	}
 
 	@Override
 	public List<Client> findClientByOwner(UserDetails owner) {
-		Set<String> ids = stringRedisTemplate.opsForSet().members(NAMESPACE_CLIENT_OWNER + owner.getUsername());
-		if (ids == null || ids.isEmpty())
-			return Collections.emptyList();
-		List<String> keys = new ArrayList<String>(ids.size());
-		for (String id : ids)
-			keys.add(NAMESPACE_CLIENT + id);
-		List<Client> list = clientRedisTemplate.opsForValue().multiGet(keys);
-		Collections.sort(list, new Comparator<Client>() {
-			@Override
-			public int compare(Client o1, Client o2) {
-				return o1.getCreateDate().compareTo(o2.getCreateDate());
-			}
-		});
-		return list;
+		DetachedCriteria dc = clientManager.detachedCriteria();
+		dc.add(Restrictions.eq("owner", owner));
+		dc.addOrder(Order.asc("createDate"));
+		return clientManager.findListByCriteria(dc);
 	}
 
 }

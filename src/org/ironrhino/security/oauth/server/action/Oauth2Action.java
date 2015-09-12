@@ -1,11 +1,13 @@
 package org.ironrhino.security.oauth.server.action;
 
 import java.io.IOException;
+import java.io.Serializable;
 import java.io.UnsupportedEncodingException;
 import java.net.URLEncoder;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Objects;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
@@ -26,6 +28,8 @@ import org.ironrhino.core.util.ExceptionUtils;
 import org.ironrhino.security.oauth.server.event.AuthorizeEvent;
 import org.ironrhino.security.oauth.server.model.Authorization;
 import org.ironrhino.security.oauth.server.model.Client;
+import org.ironrhino.security.oauth.server.model.GrantType;
+import org.ironrhino.security.oauth.server.model.ResponseType;
 import org.ironrhino.security.oauth.server.service.OAuthManager;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -43,8 +47,6 @@ import org.springframework.security.core.AuthenticationException;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
-
-import com.google.common.base.Objects;
 
 @AutoConfig
 public class Oauth2Action extends BaseAction {
@@ -78,8 +80,8 @@ public class Oauth2Action extends BaseAction {
 	private String redirect_uri;
 	private String scope;
 	private String code;
-	private String response_type;
-	private String grant_type;
+	private ResponseType response_type;
+	private GrantType grant_type;
 	private String state;
 	private String access_token;
 	private String refresh_token;
@@ -88,7 +90,7 @@ public class Oauth2Action extends BaseAction {
 	private Authorization authorization;
 	private Client client;
 
-	private Map<String, Object> tojson;
+	private Map<String, Serializable> tojson;
 	private boolean displayForNative;
 	private boolean granted;
 	private boolean denied;
@@ -109,7 +111,7 @@ public class Oauth2Action extends BaseAction {
 		this.password = password;
 	}
 
-	public Map<String, Object> getTojson() {
+	public Map<String, Serializable> getTojson() {
 		return tojson;
 	}
 
@@ -177,11 +179,11 @@ public class Oauth2Action extends BaseAction {
 		this.client_secret = client_secret;
 	}
 
-	public String getGrant_type() {
+	public GrantType getGrant_type() {
 		return grant_type;
 	}
 
-	public void setGrant_type(String grant_type) {
+	public void setGrant_type(GrantType grant_type) {
 		this.grant_type = grant_type;
 	}
 
@@ -201,11 +203,11 @@ public class Oauth2Action extends BaseAction {
 		this.scope = scope;
 	}
 
-	public String getResponse_type() {
+	public ResponseType getResponse_type() {
 		return response_type;
 	}
 
-	public void setResponse_type(String response_type) {
+	public void setResponse_type(ResponseType response_type) {
 		this.response_type = response_type;
 	}
 
@@ -243,11 +245,11 @@ public class Oauth2Action extends BaseAction {
 				throw new IllegalArgumentException("CLIENT_ID_INVALID");
 			UserDetails grantor = AuthzUtils.getUserDetails();
 			if (!"force".equals(approval_prompt) && grantor != null) {
-				List<Authorization> auths = oauthManager.findAuthorizationsByGrantor(grantor);
+				List<Authorization> auths = oauthManager.findAuthorizationsByGrantor(grantor.getUsername());
 				for (Authorization auth : auths) {
-					if (Objects.equal(auth.getClient(), client.getId())
-							&& Objects.equal(auth.getResponseType(), response_type)
-							&& Objects.equal(auth.getScope(), scope)) {
+					if (Objects.equals(auth.getClient(), client.getId())
+							&& Objects.equals(auth.getResponseType(), response_type)
+							&& Objects.equals(auth.getScope(), scope)) {
 						authorization = auth;
 						break;
 					}
@@ -312,7 +314,7 @@ public class Oauth2Action extends BaseAction {
 		}
 		try {
 			if (authorization == null)
-				authorization = oauthManager.grant(getUid(), grantor);
+				authorization = oauthManager.grant(getUid(), grantor.getUsername());
 			client = oauthManager.findClientById(authorization.getClient());
 			displayForNative = client.isNative();
 			granted = true;
@@ -372,7 +374,7 @@ public class Oauth2Action extends BaseAction {
 	public String token() {
 		HttpServletRequest request = ServletActionContext.getRequest();
 		HttpServletResponse response = ServletActionContext.getResponse();
-		if ("password".equals(grant_type)) {
+		if (grant_type == GrantType.password) {
 			client = oauthManager.findClientById(client_id);
 			try {
 				if (client == null)
@@ -391,7 +393,7 @@ public class Oauth2Action extends BaseAction {
 						throw new IllegalArgumentException(getText(failed.getClass().getName()));
 					}
 					UserDetails u = userDetailsService.loadUserByUsername(username);
-					authorization = oauthManager.grant(client, u);
+					authorization = oauthManager.grant(client, u.getUsername());
 				} catch (UsernameNotFoundException e) {
 					throw new IllegalArgumentException("USERNAME_NOT_EXISTS");
 				}
@@ -407,14 +409,15 @@ public class Oauth2Action extends BaseAction {
 				}
 				return NONE;
 			}
-			tojson = new HashMap<String, Object>();
+			tojson = new HashMap<>();
 			tojson.put("access_token", authorization.getAccessToken());
 			tojson.put("refresh_token", authorization.getRefreshToken());
 			tojson.put("expires_in", authorization.getExpiresIn());
-			eventPublisher.publish(new AuthorizeEvent(username, request.getRemoteAddr(), client.getName(), grant_type),
+			eventPublisher.publish(
+					new AuthorizeEvent(username, request.getRemoteAddr(), client.getName(), grant_type.name()),
 					Scope.LOCAL);
 			return JSON;
-		} else if ("client_credential".equals(grant_type)) {
+		} else if (grant_type == GrantType.client_credential) {
 			client = new Client();
 			client.setId(client_id);
 			client.setSecret(client_secret);
@@ -432,18 +435,18 @@ public class Oauth2Action extends BaseAction {
 				}
 				return NONE;
 			}
-			tojson = new HashMap<String, Object>();
+			tojson = new HashMap<>();
 			tojson.put("access_token", authorization.getAccessToken());
 			tojson.put("refresh_token", authorization.getRefreshToken());
 			tojson.put("expires_in", authorization.getExpiresIn());
 			return JSON;
-		} else if ("refresh_token".equals(grant_type)) {
+		} else if (grant_type == GrantType.refresh_token) {
 			client = new Client();
 			client.setId(client_id);
 			client.setSecret(client_secret);
 			try {
 				authorization = oauthManager.refresh(client, refresh_token);
-				tojson = new HashMap<String, Object>();
+				tojson = new HashMap<>();
 				tojson.put("access_token", authorization.getAccessToken());
 				tojson.put("expires_in", authorization.getExpiresIn());
 				tojson.put("refresh_token", authorization.getRefreshToken());
@@ -461,7 +464,7 @@ public class Oauth2Action extends BaseAction {
 			}
 			return JSON;
 		} else {
-			if (!"authorization_code".equals(grant_type)) {
+			if (grant_type != GrantType.authorization_code) {
 				String message = "grant_type must be authorization_code";
 				if (httpErrorHandler != null
 						&& httpErrorHandler.handle(request, response, HttpServletResponse.SC_BAD_REQUEST, message))
@@ -479,12 +482,12 @@ public class Oauth2Action extends BaseAction {
 			client.setRedirectUri(redirect_uri);
 			try {
 				authorization = oauthManager.authenticate(code, client);
-				tojson = new HashMap<String, Object>();
+				tojson = new HashMap<>();
 				tojson.put("access_token", authorization.getAccessToken());
 				tojson.put("expires_in", authorization.getExpiresIn());
 				tojson.put("refresh_token", authorization.getRefreshToken());
 				eventPublisher.publish(
-						new AuthorizeEvent(username, request.getRemoteAddr(), client.getName(), grant_type),
+						new AuthorizeEvent(username, request.getRemoteAddr(), client.getName(), grant_type.name()),
 						Scope.LOCAL);
 			} catch (Exception e) {
 				if (httpErrorHandler != null && httpErrorHandler.handle(request, response,
@@ -507,7 +510,7 @@ public class Oauth2Action extends BaseAction {
 		HttpServletResponse response = ServletActionContext.getResponse();
 		if (access_token == null && token != null)
 			access_token = token;
-		tojson = new HashMap<String, Object>();
+		tojson = new HashMap<>();
 		authorization = oauthManager.retrieve(access_token);
 		if (authorization == null) {
 			if (httpErrorHandler != null

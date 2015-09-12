@@ -13,40 +13,27 @@ import org.hibernate.criterion.DetachedCriteria;
 import org.hibernate.criterion.Order;
 import org.hibernate.criterion.Restrictions;
 import org.ironrhino.core.metadata.Trigger;
+import org.ironrhino.core.servlet.RequestContext;
 import org.ironrhino.core.spring.configuration.ServiceImplementationConditional;
 import org.ironrhino.core.util.CodecUtils;
 import org.ironrhino.security.oauth.server.model.Authorization;
 import org.ironrhino.security.oauth.server.model.Client;
+import org.ironrhino.security.oauth.server.model.GrantType;
+import org.ironrhino.security.oauth.server.model.ResponseType;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.beans.factory.annotation.Value;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.stereotype.Component;
 
 @Component("oauthManager")
 @ServiceImplementationConditional(profiles = { DEFAULT, DUAL, CLOUD })
-public class OAuthManagerImpl implements OAuthManager {
+public class DefaultOAuthManager extends AbstractOAuthManager {
 
 	@Autowired
 	private ClientManager clientManager;
 
 	@Autowired
 	private AuthorizationManager authorizationManager;
-
-	@Value("${oauth.authorization.lifetime:3600}")
-	private int authorizationLifetime;
-
-	@Value("${oauth.authorization.expireTime:" + DEFAULT_EXPIRE_TIME + "}")
-	private long expireTime;
-
-	public void setExpireTime(long expireTime) {
-		this.expireTime = expireTime;
-	}
-
-	@Override
-	public long getExpireTime() {
-		return expireTime;
-	}
 
 	@Override
 	public Authorization grant(Client client) {
@@ -59,27 +46,39 @@ public class OAuthManagerImpl implements OAuthManager {
 		if (authorizationLifetime > 0)
 			auth.setLifetime(authorizationLifetime);
 		auth.setClient(client.getId());
-		auth.setResponseType("token");
+		auth.setResponseType(ResponseType.token);
+		auth.setGrantType(GrantType.client_credential);
+		try {
+			auth.setAddress(RequestContext.getRequest().getRemoteAddr());
+		} catch (NullPointerException npe) {
+		}
 		auth.setRefreshToken(CodecUtils.nextId());
 		authorizationManager.save(auth);
 		return auth;
 	}
 
 	@Override
-	public Authorization grant(Client client, UserDetails grantor) {
+	public Authorization grant(Client client, String grantor) {
+		if (exclusive)
+			deleteAuthorizationsByGrantor(grantor, client.getId(), GrantType.password);
 		Authorization auth = new Authorization();
 		if (authorizationLifetime > 0)
 			auth.setLifetime(authorizationLifetime);
 		auth.setClient(client.getId());
-		auth.setGrantor(grantor.getUsername());
-		auth.setResponseType("token");
+		auth.setGrantor(grantor);
+		auth.setResponseType(ResponseType.token);
+		auth.setGrantType(GrantType.password);
+		try {
+			auth.setAddress(RequestContext.getRequest().getRemoteAddr());
+		} catch (NullPointerException npe) {
+		}
 		auth.setRefreshToken(CodecUtils.nextId());
 		authorizationManager.save(auth);
 		return auth;
 	}
 
 	@Override
-	public Authorization generate(Client client, String redirectUri, String scope, String responseType) {
+	public Authorization generate(Client client, String redirectUri, String scope, ResponseType responseType) {
 		if (!client.supportsRedirectUri(redirectUri))
 			throw new IllegalArgumentException("redirect_uri_mismatch");
 		Authorization auth = new Authorization();
@@ -88,7 +87,7 @@ public class OAuthManagerImpl implements OAuthManager {
 		auth.setClient(client.getId());
 		if (StringUtils.isNotBlank(scope))
 			auth.setScope(scope);
-		if (StringUtils.isNotBlank(responseType))
+		if (responseType != null)
 			auth.setResponseType(responseType);
 		authorizationManager.save(auth);
 		return auth;
@@ -104,11 +103,15 @@ public class OAuthManagerImpl implements OAuthManager {
 	}
 
 	@Override
-	public Authorization grant(String authorizationId, UserDetails grantor) {
+	public Authorization grant(String authorizationId, String grantor) {
 		Authorization auth = authorizationManager.get(authorizationId);
 		if (auth == null)
 			throw new IllegalArgumentException("bad_auth");
-		auth.setGrantor(grantor.getUsername());
+		auth.setGrantor(grantor);
+		try {
+			auth.setAddress(RequestContext.getRequest().getRemoteAddr());
+		} catch (NullPointerException npe) {
+		}
 		auth.setModifyDate(new Date());
 		if (!auth.isClientSide())
 			auth.setCode(CodecUtils.nextId());
@@ -139,8 +142,11 @@ public class OAuthManagerImpl implements OAuthManager {
 			throw new IllegalArgumentException("client_secret_mismatch");
 		if (!orig.supportsRedirectUri(client.getRedirectUri()))
 			throw new IllegalArgumentException("redirect_uri_mismatch");
+		if (exclusive)
+			deleteAuthorizationsByGrantor(auth.getGrantor(), client.getId(), GrantType.authorization_code);
 		auth.setCode(null);
 		auth.setRefreshToken(CodecUtils.nextId());
+		auth.setGrantType(GrantType.authorization_code);
 		auth.setModifyDate(new Date());
 		authorizationManager.save(auth);
 		return auth;
@@ -182,11 +188,24 @@ public class OAuthManagerImpl implements OAuthManager {
 	}
 
 	@Override
-	public List<Authorization> findAuthorizationsByGrantor(UserDetails grantor) {
+	public List<Authorization> findAuthorizationsByGrantor(String grantor) {
 		DetachedCriteria dc = authorizationManager.detachedCriteria();
-		dc.add(Restrictions.eq("grantor", grantor.getUsername()));
+		dc.add(Restrictions.eq("grantor", grantor));
 		dc.addOrder(Order.desc("modifyDate"));
 		return authorizationManager.findListByCriteria(dc);
+	}
+
+	@Override
+	public void deleteAuthorizationsByGrantor(String grantor, String client, GrantType grantType) {
+		DetachedCriteria dc = authorizationManager.detachedCriteria();
+		dc.add(Restrictions.eq("grantor", grantor));
+		if (client != null)
+			dc.add(Restrictions.eq("client", client));
+		if (grantType != null)
+			dc.add(Restrictions.eq("grantType", grantType));
+		List<Authorization> list = authorizationManager.findListByCriteria(dc);
+		for (Authorization authorization : list)
+			authorizationManager.delete(authorization);
 	}
 
 	@Trigger
