@@ -8,12 +8,6 @@ import java.util.Collections;
 import java.util.Comparator;
 import java.util.List;
 
-import javassist.ClassClassPath;
-import javassist.ClassPool;
-import javassist.CtClass;
-import javassist.CtMethod;
-import javassist.bytecode.Descriptor;
-
 import org.apache.commons.io.IOUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.ironrhino.core.util.ClassScanner;
@@ -24,6 +18,12 @@ import org.ironrhino.rest.doc.annotation.ApiModule;
 import org.ironrhino.rest.doc.annotation.Fields;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
+
+import javassist.ClassClassPath;
+import javassist.ClassPool;
+import javassist.CtClass;
+import javassist.CtMethod;
+import javassist.bytecode.Descriptor;
 
 public class ApiDocHelper {
 

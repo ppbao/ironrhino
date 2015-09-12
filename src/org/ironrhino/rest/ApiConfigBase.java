@@ -56,6 +56,7 @@ public class ApiConfigBase extends WebMvcConfigurationSupport {
 	protected void configureMessageConverters(List<HttpMessageConverter<?>> converters) {
 		MappingJackson2HttpMessageConverter jackson2 = new MappingJackson2HttpMessageConverter() {
 
+			@Override
 			protected void writeInternal(Object object, HttpOutputMessage outputMessage)
 					throws IOException, HttpMessageNotWritableException {
 				super.writeInternal(object, outputMessage);
