@@ -114,6 +114,8 @@ public class EntityAction<EN extends Persistable<?>> extends BaseAction {
 
 	protected ResultPage<EN> resultPage;
 
+	protected Long tree;
+
 	protected Long parent;
 
 	protected BaseTreeableEntity parentEntity;
@@ -177,6 +179,14 @@ public class EntityAction<EN extends Persistable<?>> extends BaseAction {
 
 	public void setResultPage(ResultPage resultPage) {
 		this.resultPage = resultPage;
+	}
+
+	public Long getTree() {
+		return tree;
+	}
+
+	public void setTree(Long tree) {
+		this.tree = tree;
 	}
 
 	public Long getParent() {
@@ -468,7 +478,10 @@ public class EntityAction<EN extends Persistable<?>> extends BaseAction {
 		prepare(dc, criteriaState);
 		if (isTreeable()) {
 			if (parent == null || parent < 1) {
-				dc.add(Restrictions.isNull("parent"));
+				if (tree != null && tree > 0)
+					dc.add(Restrictions.eq("id", tree));
+				else
+					dc.add(Restrictions.isNull("parent"));
 			} else {
 				parentEntity = (BaseTreeableEntity) entityManager.get(parent);
 				String alias = criteriaState.getAliases().get("parent");
