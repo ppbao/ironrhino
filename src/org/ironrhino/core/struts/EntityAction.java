@@ -98,7 +98,7 @@ public class EntityAction<EN extends Persistable<?>> extends BaseAction {
 
 	private static final long serialVersionUID = -8442983706126047413L;
 
-	protected static Logger log = LoggerFactory.getLogger(EntityAction.class);
+	protected static Logger logger = LoggerFactory.getLogger(EntityAction.class);
 
 	private ReadonlyImpl _readonly;
 
@@ -341,7 +341,7 @@ public class EntityAction<EN extends Persistable<?>> extends BaseAction {
 
 		} catch (ConversionNotSupportedException e) {
 		} catch (Exception e) {
-			log.error(e.getMessage(), e);
+			logger.error(e.getMessage(), e);
 		}
 	}
 
@@ -621,7 +621,7 @@ public class EntityAction<EN extends Persistable<?>> extends BaseAction {
 			try {
 				_entity = getEntityClass().newInstance();
 			} catch (Exception e) {
-				log.error(e.getMessage(), e);
+				logger.error(e.getMessage(), e);
 			}
 		BeanWrapperImpl bw = new BeanWrapperImpl(_entity);
 		bw.setConversionService(conversionService);
@@ -815,7 +815,7 @@ public class EntityAction<EN extends Persistable<?>> extends BaseAction {
 						i++;
 					}
 				} catch (Exception e) {
-					log.error(e.getMessage(), e);
+					logger.error(e.getMessage(), e);
 				}
 				persisted = entityManager.findOne(caseInsensitive, args);
 				entityManager.evict(persisted);
@@ -890,7 +890,7 @@ public class EntityAction<EN extends Persistable<?>> extends BaseAction {
 					bwp.setPropertyValue(name, bw.getPropertyValue(name));
 				bw = bwp;
 			} catch (Exception e) {
-				log.error(e.getMessage(), e);
+				logger.error(e.getMessage(), e);
 			}
 		} else {
 			if (naturalIdMutable && naturalIds.size() > 0) {
@@ -906,7 +906,7 @@ public class EntityAction<EN extends Persistable<?>> extends BaseAction {
 						i++;
 					}
 				} catch (Exception e) {
-					log.error(e.getMessage(), e);
+					logger.error(e.getMessage(), e);
 				}
 				persisted = entityManager.findOne(caseInsensitive, args);
 				entityManager.evict(persisted);
@@ -997,7 +997,7 @@ public class EntityAction<EN extends Persistable<?>> extends BaseAction {
 				bw = bwp;
 				_entity = persisted;
 			} catch (Exception e) {
-				log.error(e.getMessage(), e);
+				logger.error(e.getMessage(), e);
 			}
 		}
 		if (isTreeable()) {
@@ -1066,7 +1066,7 @@ public class EntityAction<EN extends Persistable<?>> extends BaseAction {
 				}
 			}
 		} catch (Exception e) {
-			log.error(e.getMessage(), e);
+			logger.error(e.getMessage(), e);
 		}
 		return true;
 	}
@@ -1221,7 +1221,7 @@ public class EntityAction<EN extends Persistable<?>> extends BaseAction {
 				id[i] = (Serializable) bw.getPropertyValue("id");
 			}
 		} catch (Exception e) {
-			log.error(e.getMessage(), e);
+			logger.error(e.getMessage(), e);
 		}
 		if (id.length > 0) {
 			Tuple<Owner, Class<? extends UserDetails>> ownerProperty = getOwnerProperty();
@@ -1407,7 +1407,7 @@ public class EntityAction<EN extends Persistable<?>> extends BaseAction {
 				id[i] = (Serializable) bw.getPropertyValue("id");
 			}
 		} catch (Exception e) {
-			log.error(e.getMessage(), e);
+			logger.error(e.getMessage(), e);
 		}
 		if (id.length > 0) {
 			Tuple<Owner, Class<? extends UserDetails>> ownerProperty = getOwnerProperty();
@@ -1603,7 +1603,7 @@ public class EntityAction<EN extends Persistable<?>> extends BaseAction {
 				ReflectionContextState.setDenyMethodExecution(context, false);
 			}
 		} catch (Exception e) {
-			log.error(e.getMessage(), e);
+			logger.error(e.getMessage(), e);
 		}
 		return entity;
 	}
