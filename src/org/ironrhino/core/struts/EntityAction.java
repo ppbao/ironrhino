@@ -397,7 +397,7 @@ public class EntityAction<EN extends Persistable<?>> extends BaseAction {
 			resultPage.setCriteria(doPrepareCriteria(entityManager, bw, richtableConfig, searchable, ownerProperty));
 			resultPage = entityManager.findByResultPage(resultPage);
 		} else {
-			Set<String> searchableProperties = new HashSet<String>();
+			Set<String> searchableProperties = new HashSet<>();
 			for (Map.Entry<String, UiConfigImpl> entry : getUiConfigs().entrySet()) {
 				if (entry.getValue().isSearchable())
 					searchableProperties.add(entry.getKey());
@@ -496,7 +496,7 @@ public class EntityAction<EN extends Persistable<?>> extends BaseAction {
 			}
 		}
 		if (searchable && StringUtils.isNotBlank(keyword)) {
-			Map<String, MatchMode> propertyNamesInLike = new LinkedHashMap<String, MatchMode>();
+			Map<String, MatchMode> propertyNamesInLike = new LinkedHashMap<>();
 			for (Map.Entry<String, UiConfigImpl> entry : getUiConfigs().entrySet()) {
 				if (entry.getValue().isSearchable() && !entry.getValue().isExcludedFromLike()) {
 					if (String.class.equals(entry.getValue().getPropertyType())) {
@@ -848,18 +848,17 @@ public class EntityAction<EN extends Persistable<?>> extends BaseAction {
 				bw.setConversionService(conversionService);
 				BeanWrapperImpl bwp = new BeanWrapperImpl(_entity);
 				bwp.setConversionService(conversionService);
-				Set<String> editedPropertyNames = new HashSet<String>();
-				String propertyName = null;
-				for (String parameterName : ServletActionContext.getRequest().getParameterMap().keySet()) {
-					if (parameterName.startsWith(getEntityName() + '.')
-							|| parameterName.startsWith("__checkbox_" + getEntityName() + '.')
-							|| parameterName.startsWith("__datagrid_" + getEntityName() + '.')) {
-						propertyName = parameterName.substring(parameterName.indexOf('.') + 1);
-						if (propertyName.indexOf('.') > 0)
-							propertyName = propertyName.substring(0, propertyName.indexOf('.'));
-						if (propertyName.indexOf('[') > 0)
-							propertyName = propertyName.substring(0, propertyName.indexOf('['));
-					}
+				Set<String> editedPropertyNames = new HashSet<>();
+				for (String propertyName : ServletActionContext.getRequest().getParameterMap().keySet()) {
+					if (propertyName.startsWith("__checkbox_" + getEntityName() + '.')
+							|| propertyName.startsWith("__datagrid_" + getEntityName() + '.'))
+						propertyName = propertyName.substring(propertyName.indexOf('.') + 1);
+					if (propertyName.startsWith(getEntityName() + '.'))
+						propertyName = propertyName.substring(propertyName.indexOf('.') + 1);
+					if (propertyName.indexOf('.') > 0)
+						propertyName = propertyName.substring(0, propertyName.indexOf('.'));
+					if (propertyName.indexOf('[') > 0)
+						propertyName = propertyName.substring(0, propertyName.indexOf('['));
 					UiConfigImpl uiConfig = uiConfigs.get(propertyName);
 					if (uiConfig == null || uiConfig.getReadonly().isValue()
 							|| fromList && uiConfig.getHiddenInList().isValue()
@@ -955,18 +954,17 @@ public class EntityAction<EN extends Persistable<?>> extends BaseAction {
 					}
 				}
 
-				Set<String> editedPropertyNames = new HashSet<String>();
-				String propertyName = null;
-				for (String parameterName : ServletActionContext.getRequest().getParameterMap().keySet()) {
-					if (parameterName.startsWith(getEntityName() + '.')
-							|| parameterName.startsWith("__checkbox_" + getEntityName() + '.')
-							|| parameterName.startsWith("__datagrid_" + getEntityName() + '.')) {
-						propertyName = parameterName.substring(parameterName.indexOf('.') + 1);
-						if (propertyName.indexOf('.') > 0)
-							propertyName = propertyName.substring(0, propertyName.indexOf('.'));
-						if (propertyName.indexOf('[') > 0)
-							propertyName = propertyName.substring(0, propertyName.indexOf('['));
-					}
+				Set<String> editedPropertyNames = new HashSet<>();
+				for (String propertyName : ServletActionContext.getRequest().getParameterMap().keySet()) {
+					if (propertyName.startsWith("__checkbox_" + getEntityName() + '.')
+							|| propertyName.startsWith("__datagrid_" + getEntityName() + '.'))
+						propertyName = propertyName.substring(propertyName.indexOf('.') + 1);
+					if (propertyName.startsWith(getEntityName() + '.'))
+						propertyName = propertyName.substring(propertyName.indexOf('.') + 1);
+					if (propertyName.indexOf('.') > 0)
+						propertyName = propertyName.substring(0, propertyName.indexOf('.'));
+					if (propertyName.indexOf('[') > 0)
+						propertyName = propertyName.substring(0, propertyName.indexOf('['));
 					UiConfigImpl uiConfig = uiConfigs.get(propertyName);
 					if (uiConfig == null || uiConfig.getReadonly().isValue()
 							|| fromList && uiConfig.getHiddenInList().isValue()
@@ -1035,7 +1033,7 @@ public class EntityAction<EN extends Persistable<?>> extends BaseAction {
 						|| !naturalIdMutable && naturalIds.keySet().contains(propertyName) && !isnew
 						|| !Persistable.class.isAssignableFrom(type))
 					continue;
-				if (!isnew && StringUtils.isNotBlank(uiConfig.getReadonly().getExpression()) && evalBoolean(
+				if (StringUtils.isNotBlank(uiConfig.getReadonly().getExpression()) && evalBoolean(
 						uiConfig.getReadonly().getExpression(), _entity, bw.getPropertyValue(propertyName)))
 					continue;
 				String parameterValue = ServletActionContext.getRequest()
@@ -1077,7 +1075,7 @@ public class EntityAction<EN extends Persistable<?>> extends BaseAction {
 				Template template = new Template(null, "${(" + expression + ")?string!}",
 						freemarkerManager.getConfig());
 				StringWriter sw = new StringWriter();
-				Map<String, Object> rootMap = new HashMap<String, Object>(2, 1);
+				Map<String, Object> rootMap = new HashMap<>(2, 1);
 				rootMap.put("entity", entity);
 				template.process(rootMap, sw);
 				return sw.toString().equals("true");
@@ -1169,7 +1167,7 @@ public class EntityAction<EN extends Persistable<?>> extends BaseAction {
 				}
 			}
 		}
-		Map<String, Object> map = new LinkedHashMap<String, Object>();
+		Map<String, Object> map = new LinkedHashMap<>();
 		Set<String> jsonIgnores = AnnotationUtils.getAnnotatedPropertyNames(getEntityClass(), JsonIgnore.class);
 		for (Map.Entry<String, UiConfigImpl> entry : getUiConfigs().entrySet()) {
 			if (jsonIgnores.contains(entry.getKey()))
