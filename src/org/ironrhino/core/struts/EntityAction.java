@@ -741,7 +741,9 @@ public class EntityAction<EN extends Persistable<?>> extends BaseAction {
 			}
 		}
 		BaseManager<Persistable<?>> entityManager = getEntityManager(getEntityClass());
+		beforeSave((EN) _entity);
 		entityManager.save(_entity);
+		afterSave((EN) _entity);
 		addActionMessage(getText("save.success"));
 		return SUCCESS;
 	}
@@ -1070,6 +1072,14 @@ public class EntityAction<EN extends Persistable<?>> extends BaseAction {
 			logger.error(e.getMessage(), e);
 		}
 		return true;
+	}
+
+	protected void beforeSave(EN en) {
+
+	}
+
+	protected void afterSave(EN en) {
+
 	}
 
 	private boolean checkEntityReadonly(String expression, Persistable<?> entity) {
