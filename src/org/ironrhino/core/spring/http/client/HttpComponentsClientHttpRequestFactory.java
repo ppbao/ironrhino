@@ -2,10 +2,13 @@ package org.ironrhino.core.spring.http.client;
 
 import java.io.IOException;
 
+import javax.net.ssl.HostnameVerifier;
+import javax.net.ssl.SSLSession;
+
 import org.apache.http.NoHttpResponseException;
-import org.apache.http.client.HttpClient;
 import org.apache.http.client.HttpRequestRetryHandler;
 import org.apache.http.client.methods.HttpUriRequest;
+import org.apache.http.impl.client.HttpClientBuilder;
 import org.apache.http.impl.client.HttpClients;
 import org.apache.http.protocol.HttpContext;
 import org.ironrhino.core.servlet.AccessFilter;
@@ -15,9 +18,24 @@ public class HttpComponentsClientHttpRequestFactory
 		extends org.springframework.http.client.HttpComponentsClientHttpRequestFactory {
 
 	public HttpComponentsClientHttpRequestFactory() {
-		HttpClient httpClient = HttpClients.custom().disableAuthCaching().disableConnectionState()
-				.disableCookieManagement().setMaxConnPerRoute(1000).setMaxConnTotal(1000)
-				.setRetryHandler(new HttpRequestRetryHandler() {
+		setHttpClient(builder().build());
+	}
+
+	public HttpComponentsClientHttpRequestFactory(boolean trustAllHosts) {
+		HttpClientBuilder builder = builder();
+		if (trustAllHosts)
+			builder.setSSLHostnameVerifier(new HostnameVerifier() {
+				@Override
+				public boolean verify(String name, SSLSession session) {
+					return true;
+				}
+			});
+		setHttpClient(builder.build());
+	}
+
+	private HttpClientBuilder builder() {
+		return HttpClients.custom().disableAuthCaching().disableConnectionState().disableCookieManagement()
+				.setMaxConnPerRoute(1000).setMaxConnTotal(1000).setRetryHandler(new HttpRequestRetryHandler() {
 					@Override
 					public boolean retryRequest(IOException ex, int executionCount, HttpContext context) {
 						if (executionCount > 3)
@@ -26,8 +44,7 @@ public class HttpComponentsClientHttpRequestFactory
 							return true;
 						return false;
 					}
-				}).build();
-		setHttpClient(httpClient);
+				});
 	}
 
 	@Override
