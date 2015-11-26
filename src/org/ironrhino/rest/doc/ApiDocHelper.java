@@ -14,7 +14,7 @@ import org.apache.commons.io.IOUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.ironrhino.core.util.ClassScanner;
 import org.ironrhino.core.util.ErrorMessage;
-import org.ironrhino.rest.ApiConfigBase;
+import org.ironrhino.core.util.JsonUtils;
 import org.ironrhino.rest.doc.annotation.Api;
 import org.ironrhino.rest.doc.annotation.ApiModule;
 import org.ironrhino.rest.doc.annotation.Fields;
@@ -30,6 +30,8 @@ import javassist.bytecode.Descriptor;
 public class ApiDocHelper {
 
 	private static ClassPool classPool = ClassPool.getDefault();
+
+	public static ObjectMapper objectMapper = JsonUtils.createNewObjectMapper();
 
 	public static List<Method> findApiMethods(Class<?> apiDocClass) throws Exception {
 		List<Method> methods = new ArrayList<>();
@@ -81,7 +83,6 @@ public class ApiDocHelper {
 
 	public static Map<String, List<ApiModuleObject>> getApiModules(String[] basePackages) {
 		Map<String, List<ApiModuleObject>> map = new LinkedHashMap<>();
-		ObjectMapper objectMapper = new ApiConfigBase().createObjectMapper();
 		Collection<Class<?>> classes = ClassScanner.scanAnnotated(basePackages, ApiModule.class);
 		for (Class<?> clazz : classes) {
 			ApiModule apiModule = clazz.getAnnotation(ApiModule.class);
