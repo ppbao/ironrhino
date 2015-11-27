@@ -5,7 +5,13 @@ import java.util.List;
 
 public class AopContext {
 
-	private static ThreadLocal<List<Class<?>>> bypass = new ThreadLocal<List<Class<?>>>();
+	public static final String CONTEXT_KEY_THIS = "_this_";
+
+	public static final String CONTEXT_KEY_ARGS = "_args_";
+
+	public static final String CONTEXT_KEY_USER = "_user_";
+
+	private static ThreadLocal<List<Class<?>>> bypass = new ThreadLocal<>();
 
 	public static void reset() {
 		bypass.remove();
