@@ -117,7 +117,7 @@ public class DefaultActionMapper extends AbstractActionMapper {
 		mapping = new ActionMapping();
 		mapping.setNamespace(namespace);
 		mapping.setName(org.ironrhino.core.util.StringUtils.toCamelCase(name));
-		Map<String, Object> params = new HashMap<String, Object>(4, 1);
+		Map<String, Object> params = new HashMap<>(4, 1);
 		// process resultPage.pageNo and resultPage.pageSize
 		String pn = request.getParameter(ResultPage.PAGENO_PARAM_NAME);
 		if (StringUtils.isNumeric(pn))
@@ -127,12 +127,19 @@ public class DefaultActionMapper extends AbstractActionMapper {
 			params.put("resultPage.pageSize", ps);
 		if (StringUtils.isNotBlank(methodAndUid)) {
 			String uid = null;
-			String[] array = StringUtils.split(methodAndUid, "/", 2);
-			mapping.setMethod(array[0]);
-			if (array.length > 1) {
+			if (methodAndUid.indexOf('/') < 0) {
+				char ch = methodAndUid.charAt(0);
+				if ((ch >= '0' && ch <= '9') || StringUtils.isNumeric(methodAndUid)
+						|| !StringUtils.isAlphanumeric(methodAndUid) || methodAndUid.length() >= 20) {
+					uid = methodAndUid;
+				} else {
+					mapping.setMethod(methodAndUid);
+				}
+			} else {
+				String[] array = StringUtils.split(methodAndUid, "/", 2);
+				mapping.setMethod(array[0]);
 				uid = array[1];
 			}
-
 			if (StringUtils.isNotBlank(uid)) {
 				try {
 					params.put(ID, URLDecoder.decode(uid, getEncoding()));
