@@ -16,11 +16,14 @@ import org.ironrhino.core.spring.configuration.ServiceImplementationConditional;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.core.serializer.support.SerializationFailedException;
 import org.springframework.dao.DataAccessException;
 import org.springframework.data.redis.connection.RedisConnection;
 import org.springframework.data.redis.core.RedisCallback;
 import org.springframework.data.redis.core.RedisTemplate;
+import org.springframework.data.redis.core.script.DefaultRedisScript;
+import org.springframework.data.redis.core.script.RedisScript;
 import org.springframework.stereotype.Component;
 
 @SuppressWarnings({ "unchecked", "rawtypes" })
@@ -32,9 +35,13 @@ public class RedisCacheManager implements CacheManager {
 
 	private RedisTemplate redisTemplate;
 
+	private RedisTemplate stringRedisTemplate;
+
 	@Autowired
-	public RedisCacheManager(RedisTemplate redisTemplate) {
+	public RedisCacheManager(RedisTemplate redisTemplate,
+			@Qualifier("stringRedisTemplate") RedisTemplate stringRedisTemplate) {
 		this.redisTemplate = redisTemplate;
+		this.stringRedisTemplate = stringRedisTemplate;
 	}
 
 	@Override
@@ -258,6 +265,14 @@ public class RedisCacheManager implements CacheManager {
 	@Override
 	public boolean supportsUpdateTimeToLive() {
 		return true;
+	}
+
+	@Override
+	public void invalidate(String namespace) {
+		RedisScript<Boolean> script = new DefaultRedisScript<>(
+				"local keys = redis.call('keys', ARGV[1]) \n for i=1,#keys,5000 do \n redis.call('del', unpack(keys, i, math.min(i+4999, #keys))) \n end \n return true",
+				Boolean.class);
+		stringRedisTemplate.execute(script, null, namespace + ":*");
 	}
 
 }
