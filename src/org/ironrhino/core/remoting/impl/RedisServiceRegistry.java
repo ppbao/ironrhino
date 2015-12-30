@@ -132,8 +132,6 @@ public class RedisServiceRegistry extends AbstractServiceRegistry {
 
 	@Override
 	public Map<String, String> getDiscoveredServices(String host) {
-		if (host.indexOf(':') < 0)
-			host += ":" + DEFAULT_PORT;
 		Map<Object, Object> map = stringRedisTemplate.opsForHash().entries(NAMESPACE_HOSTS + host);
 		Map<String, String> services = new TreeMap<String, String>();
 		for (Map.Entry<Object, Object> entry : map.entrySet())
