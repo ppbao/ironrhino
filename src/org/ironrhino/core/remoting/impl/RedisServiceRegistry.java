@@ -102,7 +102,7 @@ public class RedisServiceRegistry extends AbstractServiceRegistry {
 		Runnable task = new Runnable() {
 			@Override
 			public void run() {
-				stringRedisTemplate.opsForHash().putAll(NAMESPACE_HOSTS + host, discoveredServices);
+				stringRedisTemplate.opsForHash().putAll(NAMESPACE_HOSTS + getLocalHost(), discoveredServices);
 			}
 		};
 		if (executorService != null)
@@ -143,7 +143,7 @@ public class RedisServiceRegistry extends AbstractServiceRegistry {
 	@Override
 	public void destroy() {
 		super.destroy();
-		stringRedisTemplate.delete(NAMESPACE_HOSTS + host);
+		stringRedisTemplate.delete(NAMESPACE_HOSTS + getLocalHost());
 	}
 
 }
