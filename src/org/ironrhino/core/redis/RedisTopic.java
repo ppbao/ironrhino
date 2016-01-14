@@ -75,7 +75,9 @@ public abstract class RedisTopic<T extends Serializable> implements org.ironrhin
 
 	@Override
 	public void publish(final T message, Scope scope) {
-		if (scope == null || scope == Scope.LOCAL) {
+		if (scope == null)
+			scope = Scope.GLOBAL;
+		if (scope == Scope.LOCAL) {
 			Runnable task = new Runnable() {
 				@Override
 				public void run() {
@@ -89,6 +91,11 @@ public abstract class RedisTopic<T extends Serializable> implements org.ironrhin
 		} else {
 			redisTemplate.convertAndSend(getChannelName(scope), message);
 		}
+	}
+
+	@Override
+	public void publish(final T message) {
+		publish(message, null);
 	}
 
 }
