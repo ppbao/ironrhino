@@ -10,10 +10,10 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
-import org.ironrhino.common.model.tuples.Pair;
 import org.ironrhino.core.metadata.Authorize;
 import org.ironrhino.core.metadata.Menu;
 import org.ironrhino.core.model.BaseTreeableEntity;
+import org.ironrhino.core.model.Tuple;
 import org.ironrhino.core.security.dynauth.DynamicAuthorizer;
 import org.ironrhino.core.security.dynauth.DynamicAuthorizerManager;
 import org.ironrhino.core.struts.AutoConfigPackageProvider;
@@ -43,13 +43,13 @@ public class MenuControl {
 	@Autowired(required = false)
 	protected transient DynamicAuthorizerManager dynamicAuthorizerManager;
 
-	public Map<String, Pair<Menu, Authorize>> getMapping() {
+	public Map<String, Tuple<Menu, Authorize>> getMapping() {
 		ActionContext ctx = ActionContext.getContext();
 		if (ctx == null)
 			return null;
 		Container container = ctx.getContainer();
 		container.inject(this);
-		Map<String, Pair<Menu, Authorize>> mapping = new HashMap<String, Pair<Menu, Authorize>>();
+		Map<String, Tuple<Menu, Authorize>> mapping = new HashMap<>();
 		Collection<PackageConfig> pcs = ((AutoConfigPackageProvider) packageProvider).getAllPackageConfigs();
 		for (PackageConfig pc : pcs) {
 			Collection<ActionConfig> acs = pc.getActionConfigs().values();
@@ -64,8 +64,7 @@ public class MenuControl {
 							StringBuilder sb = new StringBuilder();
 							sb.append(pc.getNamespace()).append(pc.getNamespace().endsWith("/") ? "" : "/")
 									.append(ac.getName());
-							mapping.put(sb.toString(),
-									new Pair<Menu, Authorize>(menu, entityClass.getAnnotation(Authorize.class)));
+							mapping.put(sb.toString(), new Tuple<>(menu, entityClass.getAnnotation(Authorize.class)));
 						}
 						continue;
 					}
@@ -75,7 +74,7 @@ public class MenuControl {
 						StringBuilder sb = new StringBuilder();
 						sb.append(pc.getNamespace()).append(pc.getNamespace().endsWith("/") ? "" : "/")
 								.append(ac.getName());
-						mapping.put(sb.toString(), new Pair<Menu, Authorize>(menuOnClass, authorizeOnClass));
+						mapping.put(sb.toString(), new Tuple<>(menuOnClass, authorizeOnClass));
 					}
 					Set<Method> methods = AnnotationUtils.getAnnotatedMethods(c, Menu.class);
 					for (Method m : methods) {
@@ -86,8 +85,7 @@ public class MenuControl {
 								.append(ac.getName());
 						if (!m.getName().equals("execute"))
 							sb.append("/").append(m.getName());
-						mapping.put(sb.toString(),
-								new Pair<Menu, Authorize>(menu, authorize == null ? authorizeOnClass : authorize));
+						mapping.put(sb.toString(), new Tuple<>(menu, authorize == null ? authorizeOnClass : authorize));
 					}
 				} catch (ClassNotFoundException e) {
 					e.printStackTrace();
@@ -99,7 +97,7 @@ public class MenuControl {
 
 	public MenuNode getTree() {
 		if (tree == null) {
-			Map<String, Pair<Menu, Authorize>> mapping = getMapping();
+			Map<String, Tuple<Menu, Authorize>> mapping = getMapping();
 			if (mapping != null)
 				tree = assemble(mapping);
 		}
@@ -109,7 +107,7 @@ public class MenuControl {
 	}
 
 	private void filterUnauthorized(MenuNode node) {
-		List<MenuNode> list = new ArrayList<MenuNode>();
+		List<MenuNode> list = new ArrayList<>();
 		Collection<MenuNode> children = node.getChildren();
 		Iterator<MenuNode> it = children.iterator();
 		while (it.hasNext()) {
@@ -219,24 +217,23 @@ public class MenuControl {
 	}
 
 	@SuppressWarnings({ "unchecked", "rawtypes" })
-	private MenuNode assemble(final Map<String, Pair<Menu, Authorize>> mapping) {
+	private MenuNode assemble(final Map<String, Tuple<Menu, Authorize>> mapping) {
 		MenuNode root = new MenuNode();
-		List<Map.Entry<String, Pair<Menu, Authorize>>> list = new ArrayList<Map.Entry<String, Pair<Menu, Authorize>>>(
-				mapping.entrySet());
-		Collections.sort(list, new ValueThenKeyComparator<String, Pair<Menu, Authorize>>() {
+		List<Map.Entry<String, Tuple<Menu, Authorize>>> list = new ArrayList<>(mapping.entrySet());
+		Collections.sort(list, new ValueThenKeyComparator<String, Tuple<Menu, Authorize>>() {
 			@Override
-			protected int compareValue(Pair<Menu, Authorize> a, Pair<Menu, Authorize> b) {
-				return a.getA().parents().length - b.getA().parents().length;
+			protected int compareValue(Tuple<Menu, Authorize> a, Tuple<Menu, Authorize> b) {
+				return a.getKey().parents().length - b.getKey().parents().length;
 			}
 		});
-		for (Map.Entry<String, Pair<Menu, Authorize>> entry : list) {
+		for (Map.Entry<String, Tuple<Menu, Authorize>> entry : list) {
 			String url = entry.getKey();
-			Menu menu = entry.getValue().getA();
+			Menu menu = entry.getValue().getKey();
 			MenuNode node = new MenuNode();
 			node.setUrl(url);
 			node.setName(menu.name());
 			node.setDisplayOrder(menu.displayOrder());
-			node.setAuthorize(entry.getValue().getB());
+			node.setAuthorize(entry.getValue().getValue());
 			MenuNode parent = root;
 			if (menu.parents().length != 0) {
 				String[] parents = menu.parents();
@@ -247,7 +244,7 @@ public class MenuControl {
 						mn.setName(str);
 						mn.setParent(parent);
 						if (!(parent.getChildren() instanceof List)) {
-							List<MenuNode> children = new ArrayList<MenuNode>();
+							List<MenuNode> children = new ArrayList<>();
 							children.addAll(parent.getChildren());
 							parent.setChildren(children);
 						}
@@ -259,7 +256,7 @@ public class MenuControl {
 			}
 			node.setParent(parent);
 			if (!(parent.getChildren() instanceof List)) {
-				List<MenuNode> children = new ArrayList<MenuNode>();
+				List<MenuNode> children = new ArrayList<>();
 				children.addAll(parent.getChildren());
 				parent.setChildren(children);
 			}
