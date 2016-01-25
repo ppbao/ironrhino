@@ -298,6 +298,7 @@ public class BaseTreeableEntity<T extends BaseTreeableEntity<T>> extends Entity<
 
 	@Override
 	public String toString() {
-		return this.name;
+		return StringUtils.defaultString(this.name);
 	}
+
 }
