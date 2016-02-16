@@ -96,5 +96,5 @@ public abstract class RabbitTopic<T extends Serializable> implements Topic<T> {
 	public void publish(final T message) {
 		publish(message, null);
 	}
-	
+
 }

@@ -32,6 +32,7 @@ class FstTranscoder implements Transcoder<Object> {
 	protected CompressionMode compressMode = CompressionMode.GZIP;
 	protected static final Logger log = LoggerFactory.getLogger(FstTranscoder.class);
 
+	@Override
 	public void setCompressionThreshold(int to) {
 		this.compressionThreshold = to;
 	}
@@ -40,6 +41,7 @@ class FstTranscoder implements Transcoder<Object> {
 		return compressMode;
 	}
 
+	@Override
 	public void setCompressionMode(CompressionMode compressMode) {
 		this.compressMode = compressMode;
 	}
@@ -246,10 +248,12 @@ class FstTranscoder implements Transcoder<Object> {
 		return rv;
 	}
 
+	@Override
 	public void setPackZeros(boolean packZeros) {
 		this.transcoderUtils.setPackZeros(packZeros);
 	}
 
+	@Override
 	public void setPrimitiveAsString(boolean primitiveAsString) {
 		this.primitiveAsString = primitiveAsString;
 	}
@@ -297,10 +301,12 @@ class FstTranscoder implements Transcoder<Object> {
 		this.maxSize = max;
 	}
 
+	@Override
 	public boolean isPackZeros() {
 		return this.transcoderUtils.isPackZeros();
 	}
 
+	@Override
 	public boolean isPrimitiveAsString() {
 		return this.primitiveAsString;
 	}
@@ -310,6 +316,7 @@ class FstTranscoder implements Transcoder<Object> {
 	 * 
 	 * @see net.spy.memcached.Transcoder#decode(net.spy.memcached.CachedData)
 	 */
+	@Override
 	public final Object decode(CachedData d) {
 		Object obj = d.decodedObject;
 		if (obj != null) {
@@ -378,6 +385,7 @@ class FstTranscoder implements Transcoder<Object> {
 	 * 
 	 * @see net.spy.memcached.Transcoder#encode(java.lang.Object)
 	 */
+	@Override
 	public final CachedData encode(Object o) {
 		byte[] b = null;
 		int flags = 0;

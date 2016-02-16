@@ -61,6 +61,7 @@ public abstract class RedisQueue<T extends Serializable> implements org.ironrhin
 		queue = new DefaultRedisList<>(queueName, redisTemplate);
 		if (consuming) {
 			Runnable task = new Runnable() {
+				@Override
 				public void run() {
 					while (!stopConsuming) {
 						try {

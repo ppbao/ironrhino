@@ -96,7 +96,7 @@ public class HttpInvokerClient extends HttpInvokerClientInterceptor implements F
 	public void setServiceStats(ServiceStats serviceStat) {
 		this.serviceStats = serviceStat;
 	}
-	
+
 	public boolean isUseFstSerialization() {
 		return useFstSerialization;
 	}
