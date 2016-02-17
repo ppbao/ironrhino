@@ -78,7 +78,7 @@ public class ZooKeeperMembership implements Membership {
 	public void leave(final String group) throws Exception {
 		LeaderLatch latch = latchs.remove(group);
 		if (latch == null)
-			throw new Exception("Please join group " + group + " first");
+			throw new IllegalStateException("Please join group " + group + " first");
 		latch.close();
 	}
 
@@ -86,7 +86,7 @@ public class ZooKeeperMembership implements Membership {
 	public boolean isLeader(String group) throws Exception {
 		LeaderLatch latch = latchs.get(group);
 		if (latch == null)
-			throw new Exception("Please join group " + group + " first");
+			throw new IllegalStateException("Please join group " + group + " first");
 		return latch.hasLeadership();
 	}
 
@@ -94,7 +94,7 @@ public class ZooKeeperMembership implements Membership {
 	public String getLeader(String group) throws Exception {
 		LeaderLatch latch = latchs.get(group);
 		if (latch == null)
-			throw new Exception("Please join group " + group + " first");
+			throw new IllegalStateException("Please join group " + group + " first");
 		return latch.getLeader().getId();
 	}
 
@@ -102,7 +102,7 @@ public class ZooKeeperMembership implements Membership {
 	public List<String> getMembers(String group) throws Exception {
 		LeaderLatch latch = latchs.get(group);
 		if (latch == null)
-			throw new Exception("Please join group " + group + " first");
+			throw new IllegalStateException("Please join group " + group + " first");
 		Collection<Participant> participants = latch.getParticipants();
 		List<String> list = new ArrayList<String>(participants.size());
 		for (Participant p : participants)
