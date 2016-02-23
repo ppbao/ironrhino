@@ -7,23 +7,24 @@ public class DataRouteContext {
 
 	public static final int DEFAULT_DATASOURCE_WEIGHT = 1;
 
-	private static ThreadLocal<Deque<Boolean>> readonly = new ThreadLocal<Deque<Boolean>>();
+	private static ThreadLocal<Deque<Boolean>> readonly = new ThreadLocal<>();
 
-	private static ThreadLocal<Deque<String>> name = new ThreadLocal<Deque<String>>();
+	private static ThreadLocal<String> routingKey = new ThreadLocal<>();
+
+	private static ThreadLocal<String> nodeName = new ThreadLocal<>();
 
 	public static void reset() {
 		Deque<Boolean> readonlyDeque = readonly.get();
 		if (readonlyDeque != null && readonlyDeque.size() > 0)
 			readonlyDeque.clear();
-		Deque<String> nameDeque = name.get();
-		if (nameDeque != null && nameDeque.size() > 0)
-			nameDeque.clear();
+		nodeName.remove();
+		routingKey.remove();
 	}
 
 	public static void setReadonly(Boolean bl) {
 		Deque<Boolean> deque = readonly.get();
 		if (deque == null) {
-			deque = new LinkedList<Boolean>();
+			deque = new LinkedList<>();
 			readonly.set(deque);
 		}
 		deque.push(bl);
@@ -44,20 +45,24 @@ public class DataRouteContext {
 		return deque.getLast(); // outside scope win.
 	}
 
-	public static void setName(String s) {
-		Deque<String> deque = name.get();
-		if (deque == null) {
-			deque = new LinkedList<String>();
-			name.set(deque);
-		}
-		deque.push(s);
+	public static void setNodeName(String s) {
+		nodeName.set(s);
 	}
 
-	static String getName() {
-		Deque<String> deque = name.get();
-		if (deque == null || deque.size() == 0)
-			return null;
-		return deque.pop();
+	static String getNodeName() {
+		String s = nodeName.get();
+		nodeName.remove();
+		return s;
+	}
+
+	public static void setRoutingKey(String s) {
+		routingKey.set(s);
+	}
+
+	static String getRoutingKey() {
+		String s = routingKey.get();
+		routingKey.remove();
+		return s;
 	}
 
 }
