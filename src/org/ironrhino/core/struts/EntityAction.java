@@ -1556,6 +1556,12 @@ public class EntityAction<EN extends Persistable<?>> extends BaseAction {
 		return JSON;
 	}
 
+	public String treeview() throws Exception {
+		if (!isTreeable())
+			return NOTFOUND;
+		return "treeview";
+	}
+
 	private Collection<Persistable> children;
 
 	public Collection<Persistable> getChildren() {
