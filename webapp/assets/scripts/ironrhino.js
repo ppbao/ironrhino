@@ -36783,6 +36783,27 @@ function uploadFiles(files, filenames) {
 				}
 			},
 			success : function(data) {
+				if (url && url.indexOf('://') > 0
+						&& !UrlUtils.isSameDomain(document.location.href, url)) {
+					var base1 = url.substring(0, url.indexOf('/', url
+											.indexOf('://')
+											+ 3));
+					var base2 = url.substring(0, url.lastIndexOf('/') + 1);
+					$('a,form,button', ele).each(function() {
+						var t = $(this);
+						var arr = 'href,action,formaction'.split(',');
+						for (var k = 0; k < arr.length; k++) {
+							var attr = arr[k];
+							var value = t.attr(attr);
+							if (value && value.indexOf('://') < 0) {
+								t.attr(attr, (value.indexOf('/') == 0
+												? base1
+												: base2)
+												+ value);
+							}
+						}
+					});
+				}
 				ele.addClass('loaded');
 			}
 		};
@@ -40603,7 +40624,7 @@ Observation.filtercolumn = function(container) {
 			t
 					.wrap('<div class="input-append"/>')
 					.parent()
-					.append('<span class="add-on" style="cursor:pointer;"><i class="glyphicon glyphicon-lock"></i></span>');
+					.append('<span class="add-on" style="cursor:pointer;"><i class="glyphicon glyphicon-lock clickable"></i></span>');
 			t.next('.add-on').click(function() {
 				$('#pattern-modal').remove();
 				var modal = $('<div id="pattern-modal" class="modal" style="z-index:10000;"><div class="modal-close"><button type="button" class="close" data-dismiss="modal" aria-hidden="true">×</button></div><div class="modal-body" style="max-height:600px;"><div class="message" style="height: 38px;"></div><div class="pattern" style="margin-top: -38px;"></div></div></div>')
