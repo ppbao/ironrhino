@@ -61,6 +61,9 @@ public class RestExceptionHandler {
 			}
 			return RestStatus.valueOf(RestStatus.CODE_FIELD_INVALID, sb.toString());
 		}
+		if (ex instanceof IllegalArgumentException) {
+			return RestStatus.valueOf(RestStatus.CODE_FIELD_INVALID, ex.getMessage());
+		}
 		if (ex.getCause() instanceof RestStatus)
 			ex = ex.getCause();
 		if (ex instanceof RestStatus) {
