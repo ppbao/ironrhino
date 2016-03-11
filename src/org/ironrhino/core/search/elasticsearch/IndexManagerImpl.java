@@ -47,7 +47,7 @@ import org.ironrhino.core.util.DateUtils;
 import org.ironrhino.core.util.JsonUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.beans.BeanWrapperImpl;
+import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 
@@ -133,8 +133,7 @@ public class IndexManagerImpl implements IndexManager {
 		if (component)
 			mapping.put("type", "object");
 		mapping.put("properties", properties);
-		BeanWrapperImpl bw = new BeanWrapperImpl(c);
-		PropertyDescriptor[] pds = bw.getPropertyDescriptors();
+		PropertyDescriptor[] pds = BeanUtils.getPropertyDescriptors(c);
 		for (PropertyDescriptor pd : pds) {
 			String name = pd.getName();
 			// if (name.equals("path"))
