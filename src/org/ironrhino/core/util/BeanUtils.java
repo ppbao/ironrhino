@@ -15,9 +15,9 @@ import java.util.Set;
 import org.ironrhino.core.metadata.NotInCopy;
 import org.ironrhino.core.model.BaseTreeableEntity;
 import org.ironrhino.core.spring.converter.EnumToEnumConverter;
-import org.ironrhino.core.spring.converter.IntegerToEnumConverter;
+import org.ironrhino.core.spring.converter.EnumToIntegerConverter;
+import org.ironrhino.core.spring.converter.IntegerToEnumConverterFactory;
 import org.ironrhino.core.spring.converter.SerializableToSerializableConverter;
-import org.ironrhino.core.spring.converter.StringToEnumConverter;
 import org.springframework.beans.BeanWrapperImpl;
 import org.springframework.core.convert.ConversionService;
 import org.springframework.core.convert.support.DefaultConversionService;
@@ -27,8 +27,8 @@ public class BeanUtils {
 	static DefaultConversionService conversionService = new DefaultConversionService();
 
 	static {
-		conversionService.addConverter(new StringToEnumConverter());
-		conversionService.addConverter(new IntegerToEnumConverter());
+		conversionService.addConverterFactory(new IntegerToEnumConverterFactory());
+		conversionService.addConverter(Enum.class, Integer.class, new EnumToIntegerConverter((conversionService)));
 		conversionService.addConverter(new EnumToEnumConverter());
 		conversionService.addConverter(new SerializableToSerializableConverter());
 	}
