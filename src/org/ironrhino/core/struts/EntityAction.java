@@ -1585,6 +1585,8 @@ public class EntityAction<EN extends Persistable<?>> extends BaseAction {
 			return NOTFOUND;
 		if (parent != null && parent > 0) {
 			_entity = getEntityManager(getEntityClass()).get(parent);
+			if(_entity == null)
+				return NOTFOUND;
 			putEntityToValueStack(_entity);
 		}
 		return "treeview";
