@@ -19,6 +19,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
+import javax.persistence.GeneratedValue;
 import javax.persistence.Version;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
@@ -165,9 +166,11 @@ public class EntityAction<EN extends Persistable<?>> extends BaseAction {
 	}
 
 	public boolean isIdAssigned() {
+		GeneratedValue generatedValue = AnnotationUtils
+				.getAnnotatedPropertyNameAndAnnotations(getEntityClass(), GeneratedValue.class).get("id");
 		GenericGenerator genericGenerator = AnnotationUtils
 				.getAnnotatedPropertyNameAndAnnotations(getEntityClass(), GenericGenerator.class).get("id");
-		return genericGenerator != null && "assigned".equals(genericGenerator.strategy());
+		return generatedValue == null || genericGenerator != null && "assigned".equals(genericGenerator.strategy());
 	}
 
 	public Persistable getEntity() {
@@ -1585,7 +1588,7 @@ public class EntityAction<EN extends Persistable<?>> extends BaseAction {
 			return NOTFOUND;
 		if (parent != null && parent > 0) {
 			_entity = getEntityManager(getEntityClass()).get(parent);
-			if(_entity == null)
+			if (_entity == null)
 				return NOTFOUND;
 			putEntityToValueStack(_entity);
 		}
