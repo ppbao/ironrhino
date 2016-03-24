@@ -1,6 +1,7 @@
 package org.ironrhino.core.hibernate;
 
 import java.io.IOException;
+import java.lang.reflect.Field;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
@@ -13,11 +14,16 @@ import java.util.Properties;
 import javax.persistence.Entity;
 
 import org.apache.commons.lang3.StringUtils;
+import org.hibernate.SessionFactory;
 import org.hibernate.cfg.AvailableSettings;
+import org.hibernate.cfg.Configuration;
+import org.hibernate.id.factory.IdentifierGeneratorFactory;
 import org.ironrhino.core.hibernate.dialect.MyDialectResolver;
 import org.ironrhino.core.util.ClassScanner;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.orm.hibernate4.LocalSessionFactoryBuilder;
 
 public class SessionFactoryBean extends org.springframework.orm.hibernate4.LocalSessionFactoryBean {
 
@@ -26,6 +32,9 @@ public class SessionFactoryBean extends org.springframework.orm.hibernate4.Local
 	private Class<?>[] annotatedClasses;
 
 	private String excludeFilter;
+
+	@Autowired(required = false)
+	private IdentifierGeneratorFactory identifierGeneratorFactory;
 
 	public void setExcludeFilter(String excludeFilter) {
 		this.excludeFilter = excludeFilter;
@@ -83,5 +92,19 @@ public class SessionFactoryBean extends org.springframework.orm.hibernate4.Local
 			logger.info(clz.getName());
 		super.setAnnotatedClasses(annotatedClasses);
 		super.afterPropertiesSet();
+	}
+
+	@Override
+	protected SessionFactory buildSessionFactory(LocalSessionFactoryBuilder sfb) {
+		if (identifierGeneratorFactory != null) {
+			try {
+				Field f = Configuration.class.getDeclaredField("identifierGeneratorFactory");
+				f.setAccessible(true);
+				f.set(sfb, identifierGeneratorFactory);
+			} catch (Exception e) {
+				throw new RuntimeException(e);
+			}
+		}
+		return sfb.buildSessionFactory();
 	}
 }
