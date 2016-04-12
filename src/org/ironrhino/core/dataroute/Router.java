@@ -4,6 +4,6 @@ import java.util.List;
 
 public interface Router {
 
-	public int route(List<String> nodes, String routingKey);
+	public int route(List<String> nodes, Object routingKey);
 
 }
