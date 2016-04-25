@@ -13,6 +13,7 @@ import java.util.Set;
 import java.util.concurrent.ConcurrentHashMap;
 
 import javax.annotation.PostConstruct;
+import javax.annotation.PreDestroy;
 
 import org.apache.commons.io.IOUtils;
 import org.ironrhino.core.coordination.Membership;
@@ -134,6 +135,12 @@ public class RedisMembership implements Membership {
 	@Override
 	public List<String> getMembers(String group) {
 		return stringRedisTemplate.opsForList().range(NAMESPACE + group, 0, -1);
+	}
+
+	@PreDestroy
+	public void destroy() {
+		for (String group : groups)
+			stringRedisTemplate.opsForList().remove(NAMESPACE + group, 0, AppInfo.getInstanceId());
 	}
 
 }
