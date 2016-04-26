@@ -1,11 +1,11 @@
 #!/bin/bash
 
 ANT_VERSION=1.9.6
-JDK_VERSION=8u66-b17
-TOMCAT_VERSION=8.0.30
-REDIS_VERSION=3.0.5
+JDK_VERSION=8u74-b02
+TOMCAT_VERSION=8.0.32
+REDIS_VERSION=3.0.7
 #JDK_VERSION=7u80-b15
-#TOMCAT_VERSION=7.0.65
+#TOMCAT_VERSION=7.0.68
 
 #must run with sudo
 if [ ! -n "$SUDO_USER" ];then
@@ -15,30 +15,34 @@ else
 USER="$SUDO_USER"
 fi
 
-chmod +x /home/$USER
+#using aliyun as apt mirror
+cp /etc/apt/sources.list /etc/apt/sources.list.bak
+sed -i "s/us\.archive\.ubuntu\.com/mirrors.aliyun.com/g" /etc/apt/sources.list
 
-cat>/etc/yum.repos.d/mysql-community.repo<<EOF
-[mysql56-community]
-name=MySQL 5.6 Community Server
-baseurl=http://repo.mysql.com/yum/mysql-5.6-community/el/5/\$basearch/
-gpgcheck=0
-enabled=1
+#add nginx
+cat>>/etc/apt/sources.list<<EOF
+deb http://nginx.org/packages/ubuntu/ trusty nginx
+deb-src http://nginx.org/packages/ubuntu/ trusty nginx
 EOF
-
-cat>/etc/yum.repos.d/nginx.repo<<EOF
-[nginx]
-name=nginx repo
-baseurl=http://nginx.org/packages/centos/\$releasever/\$basearch/
-gpgcheck=0
-enabled=1
-EOF
-
 
 #install packages
-yum -y install mysql-server subversion git nginx chkconfig zip unzip wget make gcc telnet
+apt-get update
+apt-get --force-yes --yes install mysql-server-5.6 subversion git nginx sysv-rc-conf fontconfig xfonts-utils zip unzip wget iptables make gcc
 if [ ! -f "/sbin/insserv" ] ; then
 ln -s /usr/lib/insserv/insserv /sbin/insserv
 fi
+
+
+#install simsun font
+if [ -f "simsun.ttf" ]; then
+mv simsun.ttf /usr/share/fonts/truetype
+chmod 644 /usr/share/fonts/truetype/simsun.ttf
+cd /usr/share/fonts
+mkfontscale
+mkfontdir
+fc-cache -fv
+fi
+
 
 #install oracle jdk
 if [ ! -d jdk ];then
@@ -59,7 +63,10 @@ fi
 #install ant
 if [ ! -d ant ];then
 if ! $(ls -l apache-ant-*.tar.gz >/dev/null 2>&1) ; then
-wget http://archive.apache.org/dist/ant/binaries/apache-ant-$ANT_VERSION-bin.tar.gz
+wget http://mirrors.aliyun.com/apache/ant/binaries/apache-ant-$ANT_VERSION-bin.tar.gz
+if [ $? -ne 0 ]; then
+   http://archive.apache.org/dist/ant/binaries/apache-ant-$ANT_VERSION-bin.tar.gz
+fi
 fi
 tar xf apache-ant-*.tar.gz
 rm apache-ant-*.tar.gz
@@ -72,7 +79,10 @@ fi
 #install tomcat
 if [ ! -d tomcat8080 ];then
 if ! $(ls -l apache-tomcat-*.tar.gz >/dev/null 2>&1) ; then
-wget "http://archive.apache.org/dist/tomcat/tomcat-${TOMCAT_VERSION:0:1}/v$TOMCAT_VERSION/bin/apache-tomcat-$TOMCAT_VERSION.tar.gz"
+wget http://mirrors.aliyun.com/apache/tomcat/tomcat-${TOMCAT_VERSION:0:1}/v$TOMCAT_VERSION/bin/apache-tomcat-$TOMCAT_VERSION.tar.gz
+if [ $? -ne 0 ]; then
+   http://archive.apache.org/dist/tomcat/tomcat-${TOMCAT_VERSION:0:1}/v$TOMCAT_VERSION/bin/apache-tomcat-$TOMCAT_VERSION.tar.gz
+fi
 fi
 tar xf apache-tomcat-*.tar.gz >/dev/null && rm -rf apache-tomcat-*.tar.gz
 mv apache-tomcat-* tomcat
@@ -167,7 +177,7 @@ sed -i '99i export SPRING_PROFILES_DEFAULT=dual' tomcat/bin/catalina.sh
 if [ "${JDK_VERSION:0:1}" = "7" ];then
 sed -i '99i CATALINA_OPTS="-server -Xms128m -Xmx1024m -Xmn80m -Xss256k -XX:PermSize=128m -XX:MaxPermSize=512m -XX:+DisableExplicitGC -XX:+UseConcMarkSweepGC -XX:+UseCMSCompactAtFullCollection -XX:+UseParNewGC -XX:CMSMaxAbortablePrecleanTime=5 -Djava.awt.headless=true"' tomcat/bin/catalina.sh
 else
-sed -i '99i CATALINA_OPTS="-server -Xms128m -Xmx1024m -Xmn80m -Xss256k -XX:+DisableExplicitGC -XX:+UseG1GC -XX:SurvivorRatio=6 -XX:MaxGCPauseMillis=400 -XX:G1ReservePercent=15 -XX:InitiatingHeapOccupancyPercent=40 -XX:ConcGCThreads=2 -Djava.awt.headless=true"' tomcat/bin/catalina.sh
+sed -i '99i CATALINA_OPTS="-server -Xms128m -Xmx1024m -Xmn80m -Xss256k -XX:+DisableExplicitGC -XX:+UseG1GC -XX:SurvivorRatio=6 -XX:MaxGCPauseMillis=400 -XX:G1ReservePercent=15 -XX:InitiatingHeapOccupancyPercent=40 -Djava.awt.headless=true"' tomcat/bin/catalina.sh
 fi
 mv tomcat tomcat8080
 cp -R tomcat8080 tomcat8081
@@ -205,7 +215,7 @@ esac
 exit 0
 EOF
 chmod +x /etc/init.d/tomcat8080
-chkconfig tomcat8080 on
+update-rc.d tomcat8080 defaults
 fi
 
 if [ ! -f /etc/init.d/tomcat8081 ]; then
@@ -235,7 +245,7 @@ esac
 exit 0
 EOF
 chmod +x /etc/init.d/tomcat8081
-chkconfig tomcat8081 on
+update-rc.d tomcat8081 defaults
 fi
 
 if [ ! -f upgrade_tomcat.sh ]; then
@@ -258,7 +268,10 @@ fi
 version="\$1"
 if [ ! -d apache-tomcat-\$version ];then
 if [ ! -f apache-tomcat-\$version.tar.gz ];then
-wget http://archive.apache.org/dist/tomcat/tomcat-\${version:0:1}/v\$version/bin/apache-tomcat-\$version.tar.gz
+wget http://mirrors.aliyun.com/apache/tomcat/tomcat-\${version:0:1}/v\$version/bin/apache-tomcat-\$version.tar.gz
+if [ $? -ne 0 ]; then
+   wget http://archive.apache.org/dist/tomcat/tomcat-\${version:0:1}/v\$version/bin/apache-tomcat-\$version.tar.gz
+fi
 fi
 tar xf apache-tomcat-\$version.tar.gz && rm -rf apache-tomcat-\$version.tar.gz
 cd apache-tomcat-\$version && rm -rf bin/*.bat && rm -rf webapps/* && cd ..
@@ -309,15 +322,26 @@ fi
 
 
 #config mysql
-if [ -f "/etc/my.cnf" ] && ! $(more /etc/my.cnf|grep collation-server >/dev/null 2>&1) ; then
-sed -i '22i innodb_stats_on_metadata = off' /etc/my.cnf
-sed -i '22i collation-server = utf8_general_ci' /etc/my.cnf
-sed -i '22i character-set-server = utf8' /etc/my.cnf
-service mysqld restart
+if [ -f "/etc/mysql/my.cnf" ] && ! $(more /etc/mysql/my.cnf|grep collation-server >/dev/null 2>&1) ; then
+sed -i '/\[mysqld\]/a\lower_case_table_names = 1' /etc/mysql/my.cnf
+sed -i '/\[mysqld\]/a\innodb_stats_on_metadata = off' /etc/mysql/my.cnf
+sed -i '/\[mysqld\]/a\collation-server = utf8_general_ci' /etc/mysql/my.cnf
+sed -i '/\[mysqld\]/a\character-set-server = utf8' /etc/mysql/my.cnf
+sed -i '/\[mysqld\]/a\open_files_limit = 8192' /etc/my.cnf
+sed -i '/\[mysqld\]/a\max_connections = 1000' /etc/my.cnf
+sed -i '/\[mysqld\]/a\innodb_buffer_pool_size = 1G' /etc/my.cnf
+sed -i '/\[mysqld\]/a\key_buffer_size = 384M' /etc/my.cnf
+sed -i '/\[mysqld\]/a\sort_buffer_size = 4M' /etc/my.cnf
+sed -i '/\[mysqld\]/a\read_buffer_size = 1M' /etc/my.cnf
+sed -i '/\[mysqld\]/a\table_open_cache = 2000' /etc/my.cnf
+service mysql restart
 fi
 
 
 #config nginx
+if ! $(more /etc/nginx/nginx.conf |grep worker_rlimit_nofile >/dev/null 2>&1); then
+        sed -i '3i worker_rlimit_nofile 65535;' /etc/nginx/nginx.conf
+fi
 if [ -d /etc/nginx/sites-enabled ]  ; then
 ngigxfile="/etc/nginx/sites-enabled/default"
 else
@@ -340,6 +364,9 @@ server {
 	listen   80 default_server;
 	proxy_pass_header Server;
 	client_max_body_size 4m;
+	location /stub_status {
+		stub_status;
+	}	
 	location ~ ^/assets/ {
 		root   /home/$USER/tomcat8080/webapps/ROOT;
 		expires      max;
@@ -371,7 +398,6 @@ server {
     }
 }
 EOF
-setsebool -P httpd_can_network_connect=1 httpd_read_user_content=1
 service nginx restart
 fi
 
@@ -564,6 +590,40 @@ chmod +x exportdb.sh
 chmod +x importdb.sh
 fi
 
+
+#iptables
+if [ ! -f /etc/init.d/iptables ]; then
+cat>/etc/init.d/iptables<<EOF
+#!/bin/sh
+#
+# Startup script for the iptables
+#
+# chkconfig: 345 80 15
+# description: iptables
+user=$USER
+
+case "\$1" in
+start)
+	iptables -A INPUT -s 127.0.0.1 -d 127.0.0.1 -j ACCEPT
+	iptables -A INPUT -p tcp --dport 8080 -j DROP
+	iptables -A INPUT -p tcp --dport 8081 -j DROP
+	iptables -A INPUT -p tcp --dport 8005 -j DROP
+	iptables -A INPUT -p tcp --dport 8006 -j DROP
+       ;;
+stop)
+	iptables -F
+	iptables -X
+	iptables -Z
+       ;;
+*)
+       echo "Usage: \$0 {start|stop}"
+esac
+exit 0
+EOF
+chmod +x /etc/init.d/iptables
+update-rc.d iptables defaults
+service iptables start
+fi
 
 #install redis
 if ! which redis-server > /dev/null && ! $(ls -l redis-*.tar.gz >/dev/null 2>&1) ; then
