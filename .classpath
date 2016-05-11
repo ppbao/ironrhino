@@ -34,7 +34,7 @@
 	<classpathentry kind="lib" path="webapp/WEB-INF/lib/hibernate-commons-annotations-4.0.5.jar"/>
 	<classpathentry kind="lib" path="webapp/WEB-INF/lib/hibernate-core-4.3.11.jar"/>
 	<classpathentry kind="lib" path="webapp/WEB-INF/lib/hibernate-validator-5.2.2.jar"/>
-	<classpathentry kind="lib" path="webapp/WEB-INF/lib/HikariCP-2.4.4.jar"/>
+	<classpathentry kind="lib" path="webapp/WEB-INF/lib/HikariCP-2.4.6.jar"/>
 	<classpathentry kind="lib" path="webapp/WEB-INF/lib/httpclient-4.5.1.jar"/>
 	<classpathentry kind="lib" path="webapp/WEB-INF/lib/httpcore-4.4.3.jar"/>
 	<classpathentry kind="lib" path="webapp/WEB-INF/lib/httpmime-4.5.1.jar"/>
