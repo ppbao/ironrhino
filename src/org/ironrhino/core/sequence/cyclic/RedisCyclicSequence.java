@@ -4,6 +4,7 @@ import java.util.Calendar;
 import java.util.Collections;
 import java.util.Date;
 
+import org.ironrhino.core.util.DateUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.dao.DataAccessException;
@@ -44,8 +45,8 @@ public class RedisCyclicSequence extends AbstractCyclicSequence {
 	@Override
 	public String nextStringValue() {
 		long value = boundValueOperations.increment(1);
-		final String stringValue = String.valueOf(value);
 		Date now = now();
+		final String stringValue = String.valueOf(value);
 		if (stringValue.length() == getPaddingLength() + getCycleType().getPattern().length()) {
 			Calendar cal = Calendar.getInstance();
 			CycleType cycleType = getCycleType();
@@ -62,6 +63,12 @@ public class RedisCyclicSequence extends AbstractCyclicSequence {
 			Date d = cal.getTime();
 			if (getCycleType().isSameCycle(d, now))
 				return stringValue;
+			else if (d.after(now)) {
+				// overflow
+				long next = value
+						- Long.valueOf(DateUtils.formatDate8(now)) * ((long) Math.pow(10, getPaddingLength()));
+				return DateUtils.format(now, cycleType.getPattern()) + next;
+			}
 		}
 		final String restart = getStringValue(now, getPaddingLength(), 1);
 		boolean success = stringRedisTemplate.execute(new SessionCallback<Boolean>() {
