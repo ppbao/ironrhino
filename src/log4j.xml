@@ -12,7 +12,7 @@
 		<param name="file" value="${app.home}/logs/application.log"/>
 		<param name="encoding" value="utf-8"/>
 		<layout class="org.apache.log4j.PatternLayout">
-			<param name="ConversionPattern" value="%d %c %t%X{session}%X{request}%X{url} %p %m%n"/>
+			<param name="ConversionPattern" value="%d %c %t%X{request}%X{url} %p %m%n%th{10}"/>
 		</layout>
 	</appender>
 	<appender name="ERROR" class="org.apache.log4j.DailyRollingFileAppender">
@@ -20,7 +20,7 @@
 		<param name="encoding" value="utf-8"/>
 		<param name="threshold" value="ERROR"/>
 		<layout class="org.apache.log4j.PatternLayout">
-			<param name="ConversionPattern" value="%d %c %t%X{session}%X{request}%X{url} %p %m%n"/>
+			<param name="ConversionPattern" value="%d %c %t%X{request}%X{url} %p %m%n"/>
 		</layout>
 	</appender>
 	<appender name="HIBERNATE" class="org.apache.log4j.DailyRollingFileAppender">
@@ -36,7 +36,7 @@
 		<param name="encoding" value="utf-8"/>
 		<param name="threshold" value="INFO"/>
 		<layout class="org.apache.log4j.PatternLayout">
-			<param name="ConversionPattern" value="%d %c %p %m%n"/>
+			<param name="ConversionPattern" value="%d %c %t%X{request} %p %m%n%th{10}"/>
 		</layout>
 	</appender>
 	<appender name="REST" class="org.apache.log4j.DailyRollingFileAppender">
@@ -51,7 +51,7 @@
 		<param name="encoding" value="utf-8"/>
 		<param name="threshold" value="INFO"/>
 		<layout class="org.apache.log4j.PatternLayout">
-			<param name="ConversionPattern" value="%d%X{username}@%X{remoteAddr} %X{method}%X{url}%X{userAgent}%X{referer}%X{session}%X{request}%n"/>
+			<param name="ConversionPattern" value="%d%X{username}@%X{remoteAddr} %X{method}%X{url}%X{userAgent}%X{referer}%X{request}%n"/>
 		</layout>
 	</appender>
 	<appender name="ACCESS-WARN" class="org.apache.log4j.DailyRollingFileAppender">
@@ -59,7 +59,7 @@
 		<param name="encoding" value="utf-8"/>
 		<param name="threshold" value="WARN"/>
 		<layout class="org.apache.log4j.PatternLayout">
-			<param name="ConversionPattern" value="%d%X{username}@%X{remoteAddr} %X{method}%X{url}%X{userAgent}%X{referer}%X{session}%X{request} %m%n"/>
+			<param name="ConversionPattern" value="%d%X{username}@%X{remoteAddr} %X{method}%X{url}%X{userAgent}%X{referer}%X{request} %m%n"/>
 		</layout>
 	</appender>
    
