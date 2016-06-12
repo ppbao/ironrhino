@@ -1,7 +1,6 @@
 package org.ironrhino.security.component;
 
 import java.io.IOException;
-import java.sql.SQLException;
 
 import javax.servlet.ServletException;
 import javax.servlet.http.HttpServletRequest;
@@ -16,7 +15,7 @@ import org.ironrhino.security.model.User;
 import org.ironrhino.security.service.UserManager;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Primary;
-import org.springframework.orm.hibernate3.HibernateCallback;
+import org.springframework.orm.hibernate4.HibernateCallback;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.userdetails.UserDetails;
@@ -60,7 +59,7 @@ public class AuthenticationSuccessHandler extends DefaultAuthenticationSuccessHa
 	private void save(final LoginRecord loginRecord) {
 		userManager.execute(new HibernateCallback<LoginRecord>() {
 			@Override
-			public LoginRecord doInHibernate(Session session) throws HibernateException, SQLException {
+			public LoginRecord doInHibernate(Session session) throws HibernateException {
 				session.save(loginRecord);
 				return null;
 			}

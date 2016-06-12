@@ -4,7 +4,6 @@ import java.io.PrintWriter;
 import java.io.Serializable;
 import java.io.StringWriter;
 import java.net.URLEncoder;
-import java.sql.SQLException;
 import java.sql.Time;
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -80,7 +79,7 @@ import org.springframework.beans.InvalidPropertyException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.core.convert.ConversionService;
-import org.springframework.orm.hibernate3.HibernateCallback;
+import org.springframework.orm.hibernate4.HibernateCallback;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.util.ClassUtils;
 
@@ -1613,7 +1612,7 @@ public class EntityAction<EN extends Persistable<?>> extends BaseAction {
 			return NONE;
 		suggestions = getEntityManager(getEntityClass()).executeFind(new HibernateCallback<List<String>>() {
 			@Override
-			public List<String> doInHibernate(Session session) throws HibernateException, SQLException {
+			public List<String> doInHibernate(Session session) throws HibernateException {
 				StringBuilder hql = new StringBuilder("select ").append(propertyName).append(" from ")
 						.append(getEntityClass().getSimpleName()).append(" where ").append(propertyName)
 						.append(" like :keyword");
