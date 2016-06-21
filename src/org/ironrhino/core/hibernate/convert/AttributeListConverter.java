@@ -19,7 +19,9 @@ public class AttributeListConverter implements AttributeConverter<List<Attribute
 	public String convertToDatabaseColumn(List<Attribute> list) {
 		if (list == null)
 			return null;
-		Map<String, String> map = new LinkedHashMap<String, String>();
+		if (list.isEmpty())
+			return "";
+		Map<String, String> map = new LinkedHashMap<>();
 		for (Attribute attr : list)
 			if (StringUtils.isNotBlank(attr.getName()))
 				map.put(attr.getName(), attr.getValue());
@@ -30,6 +32,8 @@ public class AttributeListConverter implements AttributeConverter<List<Attribute
 	public List<Attribute> convertToEntityAttribute(String string) {
 		if (string == null)
 			return null;
+		if (StringUtils.isEmpty(string))
+			return new ArrayList<>();
 		try {
 			Map<String, String> map = JsonUtils.fromJson(string, JsonUtils.STRING_MAP_TYPE);
 			List<Attribute> attributes = new ArrayList<>(map.size());
