@@ -50,7 +50,7 @@ public abstract class RedisTopic<T extends Serializable> implements org.ironrhin
 	}
 
 	public RedisTopic() {
-		Class<?> clazz = ReflectionUtils.getGenericClass(getClass());
+		Class<?> clazz = ReflectionUtils.getGenericClass(getClass(), RedisTopic.class);
 		channelName = clazz.getName();
 	}
 
