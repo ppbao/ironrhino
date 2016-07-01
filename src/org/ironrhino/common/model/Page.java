@@ -2,23 +2,21 @@ package org.ironrhino.common.model;
 
 import java.io.Serializable;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.Date;
 import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Set;
 
-import javax.persistence.Access;
-import javax.persistence.AccessType;
 import javax.persistence.Column;
+import javax.persistence.Convert;
 import javax.persistence.Entity;
 import javax.persistence.Lob;
 import javax.persistence.Table;
-import javax.persistence.Transient;
 import javax.persistence.Version;
 
 import org.apache.commons.lang3.StringUtils;
 import org.hibernate.annotations.NaturalId;
+import org.ironrhino.core.hibernate.convert.StringSetConverter;
 import org.ironrhino.core.metadata.AutoConfig;
 import org.ironrhino.core.metadata.Hidden;
 import org.ironrhino.core.metadata.NotInCopy;
@@ -64,7 +62,7 @@ public class Page extends BaseEntity implements Recordable<UserDetails>, Ordered
 	@SearchableProperty
 	@Lob
 	@Column(nullable = false)
-	@UiConfig(hiddenInList = @Hidden(true) )
+	@UiConfig(hiddenInList = @Hidden(true))
 	private String content;
 
 	@SearchableProperty
@@ -79,10 +77,9 @@ public class Page extends BaseEntity implements Recordable<UserDetails>, Ordered
 	@UiConfig(hidden = true)
 	private Date draftDate;
 
-	@NotInCopy
 	@SearchableProperty(index = Index.NOT_ANALYZED)
-	@Transient
-	private Set<String> tags = new LinkedHashSet<String>(0);
+	@Convert(converter = StringSetConverter.class)
+	private Set<String> tags = new LinkedHashSet<>(0);
 
 	@NotInCopy
 	@SearchableProperty
@@ -192,24 +189,6 @@ public class Page extends BaseEntity implements Recordable<UserDetails>, Ordered
 
 	public void setTags(Set<String> tags) {
 		this.tags = tags;
-	}
-
-	@UiConfig(hidden = true)
-	@NotInCopy
-	@JsonIgnore
-	@Column(name = "tags", length = 1024)
-	@Access(AccessType.PROPERTY)
-	public String getTagsAsString() {
-		if (tags.size() > 0)
-			return StringUtils.join(tags.iterator(), ',');
-		return null;
-	}
-
-	public void setTagsAsString(String tagsAsString) {
-		tags.clear();
-		if (StringUtils.isNotBlank(tagsAsString))
-			tags.addAll(
-					Arrays.asList(org.ironrhino.core.util.StringUtils.trimTail(tagsAsString, ",").split("\\s*,\\s*")));
 	}
 
 	@Override

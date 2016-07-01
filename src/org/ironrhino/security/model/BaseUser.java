@@ -1,6 +1,5 @@
 package org.ironrhino.security.model;
 
-import java.util.Arrays;
 import java.util.Collection;
 import java.util.Date;
 import java.util.HashMap;
@@ -8,8 +7,6 @@ import java.util.LinkedHashSet;
 import java.util.Map;
 import java.util.Set;
 
-import javax.persistence.Access;
-import javax.persistence.AccessType;
 import javax.persistence.Column;
 import javax.persistence.Convert;
 import javax.persistence.MappedSuperclass;
@@ -20,6 +17,7 @@ import javax.persistence.Transient;
 import org.apache.commons.lang3.StringUtils;
 import org.hibernate.annotations.NaturalId;
 import org.ironrhino.core.hibernate.convert.StringMapConverter;
+import org.ironrhino.core.hibernate.convert.StringSetConverter;
 import org.ironrhino.core.metadata.CaseInsensitive;
 import org.ironrhino.core.metadata.NotInCopy;
 import org.ironrhino.core.metadata.UiConfig;
@@ -105,7 +103,8 @@ public class BaseUser extends BaseEntity implements RoledUserDetails, Recordable
 	private Collection<? extends GrantedAuthority> authorities;
 
 	@SearchableProperty
-	@Transient
+	@Column(length = 4000)
+	@Convert(converter = StringSetConverter.class)
 	@UiConfig(displayOrder = 100, alias = "role", template = "<#list value as r>${statics['org.ironrhino.core.util.ApplicationContextUtils'].getBean('userRoleManager').displayRole(r)}<#if r_has_next> </#if></#list>", csvTemplate = "<#list value as r>${statics['org.ironrhino.core.util.ApplicationContextUtils'].getBean('userRoleManager').displayRole(r)}<#if r_has_next>,</#if></#list>")
 	private Set<String> roles = new LinkedHashSet<String>(0);
 
@@ -191,17 +190,6 @@ public class BaseUser extends BaseEntity implements RoledUserDetails, Recordable
 		return roles;
 	}
 
-	@NotInCopy
-	@JsonIgnore
-	@Column(name = "roles", length = 4000)
-	@Access(AccessType.PROPERTY)
-	@UiConfig(hidden = true)
-	public String getRolesAsString() {
-		if (roles.size() > 0)
-			return StringUtils.join(roles.iterator(), ',');
-		return null;
-	}
-
 	@JsonProperty("roles")
 	public Set<String> getRolesForApi() {
 		if (authorities == null)
@@ -215,13 +203,6 @@ public class BaseUser extends BaseEntity implements RoledUserDetails, Recordable
 	@JsonSetter
 	public void setRoles(Set<String> roles) {
 		this.roles = roles;
-	}
-
-	public void setRolesAsString(String rolesAsString) {
-		roles.clear();
-		if (StringUtils.isNotBlank(rolesAsString))
-			roles.addAll(
-					Arrays.asList(org.ironrhino.core.util.StringUtils.trimTail(rolesAsString, ",").split("\\s*,\\s*")));
 	}
 
 	@Override
