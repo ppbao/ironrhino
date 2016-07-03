@@ -61,7 +61,7 @@ public abstract class BaseTreeableEntity<T extends BaseTreeableEntity<T>> extend
 	protected int displayOrder;
 
 	@ManyToOne(fetch = FetchType.LAZY)
-	@JoinColumn(name = "parentId", foreignKey = @ForeignKey(ConstraintMode.NO_CONSTRAINT) )
+	@JoinColumn(name = "parentId", foreignKey = @ForeignKey(ConstraintMode.NO_CONSTRAINT))
 	protected T parent;
 
 	@OneToMany(fetch = FetchType.LAZY, cascade = CascadeType.REMOVE, mappedBy = "parent")

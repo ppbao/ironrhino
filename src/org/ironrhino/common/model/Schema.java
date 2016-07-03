@@ -58,7 +58,7 @@ public class Schema extends BaseEntity {
 
 	// @Lob
 	@Column(length = 4000)
-	@Convert(converter=FieldsConverter.class)
+	@Convert(converter = FieldsConverter.class)
 	@SearchableComponent
 	@UiConfig(hiddenInList = @Hidden(true))
 	private List<SchemaField> fields = new ArrayList<>();

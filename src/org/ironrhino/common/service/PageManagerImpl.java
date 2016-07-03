@@ -303,7 +303,7 @@ public class PageManagerImpl extends BaseManagerImpl<Page> implements PageManage
 			}
 
 			List<Map.Entry<String, Integer>> _list = new ArrayList<Map.Entry<String, Integer>>(map.entrySet());
-			Collections.sort(_list, ValueThenKeyComparator.<String, Integer> getDefaultInstance());
+			Collections.sort(_list, ValueThenKeyComparator.<String, Integer>getDefaultInstance());
 			Map<String, Integer> sortedMap = new LinkedHashMap<String, Integer>();
 			for (Map.Entry<String, Integer> entry : _list)
 				sortedMap.put(entry.getKey(), entry.getValue());
