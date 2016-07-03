@@ -489,7 +489,7 @@ public enum CriterionOperator implements Displayable {
 	public static List<String> getSupportedOperators(Class<?> clazz) {
 		if (clazz == null)
 			return Collections.emptyList();
-		List<String> list = new ArrayList<String>();
+		List<String> list = new ArrayList<>();
 		for (CriterionOperator op : values())
 			if (op.supports(clazz) && !(op == EQ && (clazz == Boolean.class || clazz == boolean.class)))
 				list.add(op.name());

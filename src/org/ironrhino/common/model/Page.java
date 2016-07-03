@@ -233,7 +233,7 @@ public class Page extends BaseEntity implements Recordable<UserDetails>, Ordered
 	}
 
 	public List<Image> getImages() {
-		List<Image> images = new ArrayList<Image>();
+		List<Image> images = new ArrayList<>();
 		if (StringUtils.isNotBlank(content)) {
 			Elements elements = Jsoup.parse(content).select("img");
 			for (int i = 0; i < elements.size(); i++) {

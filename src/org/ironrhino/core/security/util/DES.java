@@ -135,7 +135,7 @@ public class DES {
 		DES instance;
 		if (instanceRef == null || (instance = instanceRef.get()) == null) {
 			instance = new DES();
-			instanceRef = new SoftReference<DES>(instance);
+			instanceRef = new SoftReference<>(instance);
 			pool.set(instanceRef);
 		}
 		return instance;

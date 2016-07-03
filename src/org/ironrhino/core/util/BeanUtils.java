@@ -110,7 +110,7 @@ public class BeanUtils {
 			throw new RuntimeException(e);
 		}
 		copyProperties(source, ret, ignoreProperties);
-		List<T> children = new ArrayList<T>();
+		List<T> children = new ArrayList<>();
 		for (T child : source.getChildren()) {
 			if (filter == null || filter.accept(child)) {
 				T t = deepClone(child, filter, ignoreProperties);

@@ -207,7 +207,7 @@ public class RSA {
 			} catch (Exception e) {
 				throw new RuntimeException(e);
 			}
-			instanceRef = new SoftReference<RSA>(instance);
+			instanceRef = new SoftReference<>(instance);
 			pool.set(instanceRef);
 		}
 		return instance;

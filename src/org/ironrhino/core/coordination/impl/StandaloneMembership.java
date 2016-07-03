@@ -22,7 +22,7 @@ public class StandaloneMembership implements Membership {
 	public void join(String group) {
 		List<String> members = groups.get(group);
 		if (members == null) {
-			members = new ArrayList<String>();
+			members = new ArrayList<>();
 			groups.put(group, members);
 		}
 		String instanceId = AppInfo.getInstanceId();

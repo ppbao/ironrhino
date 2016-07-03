@@ -46,7 +46,7 @@ public class CodecUtils {
 		if (instanceRef == null || (md5 = instanceRef.get()) == null) {
 			try {
 				md5 = MessageDigest.getInstance("MD5");
-				instanceRef = new SoftReference<MessageDigest>(md5);
+				instanceRef = new SoftReference<>(md5);
 			} catch (NoSuchAlgorithmException e) {
 				throw new IllegalStateException("md5 algorythm found");
 			}
@@ -91,7 +91,7 @@ public class CodecUtils {
 		if (instanceRef == null || (sha = instanceRef.get()) == null) {
 			try {
 				sha = MessageDigest.getInstance("SHA");
-				instanceRef = new SoftReference<MessageDigest>(sha);
+				instanceRef = new SoftReference<>(sha);
 			} catch (NoSuchAlgorithmException e) {
 				throw new IllegalStateException("sha algorythm found");
 			}

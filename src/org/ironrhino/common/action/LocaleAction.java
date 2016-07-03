@@ -82,7 +82,7 @@ public class LocaleAction extends BaseAction {
 		String[] locales = settingControl.getStringArray(Constants.SETTING_KEY_AVAILABLE_LOCALES);
 		if (locales != null && locales.length > 0) {
 			List<String> _locales = Arrays.asList(locales);
-			List<Locale> list = new ArrayList<Locale>(locales.length);
+			List<Locale> list = new ArrayList<>(locales.length);
 			for (Locale locale : availableLocales) {
 				if (_locales.contains(locale.toString()))
 					list.add(locale);

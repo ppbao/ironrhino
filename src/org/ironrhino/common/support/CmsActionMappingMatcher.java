@@ -185,7 +185,7 @@ public class CmsActionMappingMatcher implements ActionMappingMatcher {
 	}
 
 	private void buildSerieses() {
-		List<String> list = new ArrayList<String>();
+		List<String> list = new ArrayList<>();
 		if (StringUtils.isNotBlank(serieses))
 			for (String s : serieses.split("\\s*,\\s*"))
 				list.add(s);
@@ -196,7 +196,7 @@ public class CmsActionMappingMatcher implements ActionMappingMatcher {
 	}
 
 	private void buildColumns() {
-		List<String> list = new ArrayList<String>();
+		List<String> list = new ArrayList<>();
 		if (StringUtils.isNotBlank(columns))
 			for (String s : columns.split("\\s*,\\s*"))
 				list.add(s);
@@ -207,7 +207,7 @@ public class CmsActionMappingMatcher implements ActionMappingMatcher {
 	}
 
 	private void buildIssues() {
-		List<String> list = new ArrayList<String>();
+		List<String> list = new ArrayList<>();
 		if (StringUtils.isNotBlank(issues))
 			for (String s : issues.split("\\s*,\\s*"))
 				list.add(s);
@@ -222,7 +222,7 @@ public class CmsActionMappingMatcher implements ActionMappingMatcher {
 		Setting setting = event.getEntity();
 		String key = setting.getKey();
 		if (key.equals(Constants.SETTING_KEY_CMS_SERIESES)) {
-			List<String> list = new ArrayList<String>();
+			List<String> list = new ArrayList<>();
 			if (StringUtils.isNotBlank(serieses))
 				for (String s : serieses.split("\\s*,\\s*"))
 					list.add(s);
@@ -231,7 +231,7 @@ public class CmsActionMappingMatcher implements ActionMappingMatcher {
 					list.add(s);
 			seriesesList = list;
 		} else if (key.equals(Constants.SETTING_KEY_CMS_COLUMNS)) {
-			List<String> list = new ArrayList<String>();
+			List<String> list = new ArrayList<>();
 			if (StringUtils.isNotBlank(columns))
 				for (String s : columns.split("\\s*,\\s*"))
 					list.add(s);
@@ -240,7 +240,7 @@ public class CmsActionMappingMatcher implements ActionMappingMatcher {
 					list.add(s);
 			columnsList = list;
 		} else if (key.equals(Constants.SETTING_KEY_CMS_ISSUES)) {
-			List<String> list = new ArrayList<String>();
+			List<String> list = new ArrayList<>();
 			if (StringUtils.isNotBlank(issues))
 				for (String s : issues.split("\\s*,\\s*"))
 					list.add(s);

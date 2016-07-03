@@ -26,7 +26,7 @@ public class HessianServer extends HessianServiceExporter {
 
 	private static ThreadLocal<Class<?>> serviceInterface = new ThreadLocal<Class<?>>();
 
-	private static ThreadLocal<Object> service = new ThreadLocal<Object>();
+	private static ThreadLocal<Object> service = new ThreadLocal<>();
 
 	private Map<Class<?>, HessianSkeleton> skeletons = new HashMap<Class<?>, HessianSkeleton>();
 

@@ -15,7 +15,7 @@ public class CriteriaState implements Serializable {
 
 	private Map<String, Boolean> orderings = new LinkedHashMap<String, Boolean>(4);
 
-	private Set<String> criteria = new HashSet<String>();
+	private Set<String> criteria = new HashSet<>();
 
 	public Map<String, String> getAliases() {
 		return aliases;

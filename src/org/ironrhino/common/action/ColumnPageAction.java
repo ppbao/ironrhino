@@ -102,7 +102,7 @@ public class ColumnPageAction extends BaseAction {
 			// column = columns[0];
 		}
 		if (resultPage == null)
-			resultPage = new ResultPage<Page>();
+			resultPage = new ResultPage<>();
 		if (StringUtils.isBlank(column))
 			resultPage = pageManager.findResultPageByTag(resultPage, getName());
 		else

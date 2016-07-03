@@ -218,7 +218,7 @@ public class MongoFileStorage implements FileStorage {
 		File file = mongoTemplate.findById(path, File.class);
 		if (file == null || !file.isDirectory())
 			return null;
-		List<String> list = new ArrayList<String>();
+		List<String> list = new ArrayList<>();
 		List<File> files = mongoTemplate
 				.find(new Query(where("path").regex("^" + path.replaceAll("\\.", "\\\\.") + "/[^/]*$")), File.class);
 		for (File f : files) {

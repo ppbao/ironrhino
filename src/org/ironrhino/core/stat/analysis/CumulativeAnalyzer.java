@@ -50,7 +50,7 @@ public class CumulativeAnalyzer extends AbstractAnalyzer<Map<String, List<TreeNo
 			return;
 		List<TreeNode> list = result.get(pair.getKey().getNamespace());
 		if (list == null)
-			list = new ArrayList<TreeNode>();
+			list = new ArrayList<>();
 		result.put(pair.getKey().getNamespace(), list);
 		int level = pair.getKey().getLevel();
 		for (int i = 1; i <= level; i++) {

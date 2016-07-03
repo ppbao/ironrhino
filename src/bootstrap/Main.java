@@ -47,7 +47,7 @@ public class Main {
 
 	private List<URL> extractJettyJarsFromWar(String warPath) throws IOException {
 		try (JarFile jarFile = new JarFile(warPath)) {
-			List<URL> jarUrls = new ArrayList<URL>();
+			List<URL> jarUrls = new ArrayList<>();
 			for (String entryPath : this.jettyJars) {
 				File tmpFile;
 				try {

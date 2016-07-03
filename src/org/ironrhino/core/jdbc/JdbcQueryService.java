@@ -69,7 +69,7 @@ public class JdbcQueryService {
 
 	private String quoteString = "\"";
 
-	private List<String> keywords = new ArrayList<String>();
+	private List<String> keywords = new ArrayList<>();
 
 	@Value("${csv.maxRows:0}")
 	private int csvMaxRows;
@@ -160,7 +160,7 @@ public class JdbcQueryService {
 
 	@Transactional(readOnly = true)
 	public List<String> getTables() {
-		List<String> tables = new ArrayList<String>();
+		List<String> tables = new ArrayList<>();
 		Connection con = DataSourceUtils.getConnection(jdbcTemplate.getDataSource());
 		try {
 			DatabaseMetaData dbmd = con.getMetaData();

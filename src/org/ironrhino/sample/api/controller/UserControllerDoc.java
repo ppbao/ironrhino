@@ -48,7 +48,7 @@ public class UserControllerDoc extends UserController {
 	@Override
 	@Api("获取用户")
 	public DeferredResult<User> get(String username) {
-		DeferredResult<User> result = new DeferredResult<User>();
+		DeferredResult<User> result = new DeferredResult<>();
 		result.setResult(createUserForGet());
 		return result;
 	}

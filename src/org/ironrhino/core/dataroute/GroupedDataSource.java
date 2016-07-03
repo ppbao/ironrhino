@@ -53,9 +53,9 @@ public class GroupedDataSource extends AbstractDataSource implements Initializin
 
 	private RoundRobin<String> writeRoundRobin;
 
-	private Set<DataSource> deadDataSources = new HashSet<DataSource>();
+	private Set<DataSource> deadDataSources = new HashSet<>();
 
-	private Map<DataSource, Integer> failureCount = new ConcurrentHashMap<DataSource, Integer>();
+	private Map<DataSource, Integer> failureCount = new ConcurrentHashMap<>();
 
 	private int deadFailureThreshold = 3;
 
@@ -110,7 +110,7 @@ public class GroupedDataSource extends AbstractDataSource implements Initializin
 				writeSlaves.put(name, (DataSource) beanFactory.getBean(name));
 			if (masterName != null)
 				writeSlaves.put(masterName, master);
-			writeRoundRobin = new RoundRobin<String>(writeSlaveNames, new RoundRobin.UsableChecker<String>() {
+			writeRoundRobin = new RoundRobin<>(writeSlaveNames, new RoundRobin.UsableChecker<String>() {
 				@Override
 				public boolean isUsable(String target) {
 					DataSource ds = writeSlaves.get(target);
@@ -121,7 +121,7 @@ public class GroupedDataSource extends AbstractDataSource implements Initializin
 		if (readSlaveNames != null && readSlaveNames.size() > 0) {
 			for (String name : readSlaveNames.keySet())
 				readSlaves.put(name, (DataSource) beanFactory.getBean(name));
-			readRoundRobin = new RoundRobin<String>(readSlaveNames, new RoundRobin.UsableChecker<String>() {
+			readRoundRobin = new RoundRobin<>(readSlaveNames, new RoundRobin.UsableChecker<String>() {
 				@Override
 				public boolean isUsable(String target) {
 					DataSource ds = readSlaves.get(target);

@@ -76,7 +76,7 @@ public class EntityClassHelper {
 						|| genericGenerator != null && "assigned".equals(genericGenerator.strategy());
 				Map<String, NaturalId> naturalIds = org.ironrhino.core.util.AnnotationUtils
 						.getAnnotatedPropertyNameAndAnnotations(entityClass, NaturalId.class);
-				Set<String> hides = new HashSet<String>();
+				Set<String> hides = new HashSet<>();
 				map = new HashMap<String, UiConfigImpl>();
 				PropertyDescriptor[] pds = org.springframework.beans.BeanUtils.getPropertyDescriptors(entityClass);
 				List<String> fields = ReflectionUtils.getAllFields(entityClass);
@@ -404,7 +404,7 @@ public class EntityClassHelper {
 						if (searchableComponent != null) {
 							String s = searchableComponent.nestSearchableProperties();
 							if (StringUtils.isNotBlank(s)) {
-								Set<String> nestSearchableProperties = new LinkedHashSet<String>();
+								Set<String> nestSearchableProperties = new LinkedHashSet<>();
 								nestSearchableProperties.addAll(Arrays.asList(s.split("\\s*,\\s*")));
 								uci.setNestSearchableProperties(nestSearchableProperties);
 							}
@@ -417,7 +417,7 @@ public class EntityClassHelper {
 						if (naturalIds.size() > 1) {
 							if (uci.getPropertyType() != null
 									&& Persistable.class.isAssignableFrom(uci.getPropertyType())) {
-								List<String> list = new ArrayList<String>(naturalIds.size() - 1);
+								List<String> list = new ArrayList<>(naturalIds.size() - 1);
 								for (String name : naturalIds.keySet())
 									if (!name.equals(pd.getName()))
 										list.add(StringUtils.uncapitalize(entityClass.getSimpleName()) + "." + name);
@@ -471,7 +471,7 @@ public class EntityClassHelper {
 		StringBuilder sb = url != null ? new StringBuilder(url)
 				: new StringBuilder("/").append(StringUtils.uncapitalize(entityClass.getSimpleName()));
 		sb.append("/pick");
-		Set<String> columns = new LinkedHashSet<String>();
+		Set<String> columns = new LinkedHashSet<>();
 		BeanWrapperImpl bw = new BeanWrapperImpl(entityClass);
 		if (BaseTreeableEntity.class.isAssignableFrom(entityClass)) {
 			FullnameSeperator fs = entityClass.getAnnotation(FullnameSeperator.class);

@@ -111,7 +111,7 @@ public class ZooKeeperMembership implements Membership {
 		if (latch == null)
 			throw new IllegalStateException("Please join group " + group + " first");
 		Collection<Participant> participants = latch.getParticipants();
-		List<String> list = new ArrayList<String>(participants.size());
+		List<String> list = new ArrayList<>(participants.size());
 		for (Participant p : participants)
 			list.add(p.getId());
 		return list;

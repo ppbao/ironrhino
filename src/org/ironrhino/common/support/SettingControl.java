@@ -129,7 +129,7 @@ public class SettingControl {
 	}
 
 	public List<Setting> getAllBooleanSettings() {
-		List<Setting> list = new ArrayList<Setting>();
+		List<Setting> list = new ArrayList<>();
 		for (Setting s : settings.values()) {
 			String value = s.getValue();
 			if ("true".equals(value) || "false".equals(value))

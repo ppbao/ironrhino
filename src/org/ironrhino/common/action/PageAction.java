@@ -81,7 +81,7 @@ public class PageAction extends EntityAction<Page> {
 				dc.addOrder(Order.asc("path"));
 			}
 			if (resultPage == null)
-				resultPage = new ResultPage<Page>();
+				resultPage = new ResultPage<>();
 			resultPage.setCriteria(dc);
 			resultPage = pageManager.findByResultPage(resultPage);
 		} else {
@@ -100,7 +100,7 @@ public class PageAction extends EntityAction<Page> {
 			criteria.addSort("displayOrder", false);
 			criteria.addSort("path", false);
 			if (resultPage == null)
-				resultPage = new ResultPage<Page>();
+				resultPage = new ResultPage<>();
 			resultPage.setCriteria(criteria);
 			resultPage = elasticSearchService.search(resultPage);
 		}
@@ -248,7 +248,7 @@ public class PageAction extends EntityAction<Page> {
 		if (StringUtils.isBlank(keyword))
 			return NONE;
 		Map<String, Integer> map = pageManager.findMatchedTags(keyword);
-		suggestions = new ArrayList<LabelValue>(map.size());
+		suggestions = new ArrayList<>(map.size());
 		for (Map.Entry<String, Integer> entry : map.entrySet()) {
 			LabelValue lv = new LabelValue();
 			lv.setValue(entry.getKey());

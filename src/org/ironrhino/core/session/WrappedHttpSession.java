@@ -291,7 +291,7 @@ public class WrappedHttpSession implements Serializable, HttpSession {
 	@Override
 	@Deprecated
 	public String[] getValueNames() {
-		List<String> names = new ArrayList<String>();
+		List<String> names = new ArrayList<>();
 
 		for (Enumeration<String> e = getAttributeNames(); e.hasMoreElements();) {
 			names.add(e.nextElement());

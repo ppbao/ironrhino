@@ -33,9 +33,9 @@ public class ClassScanner {
 
 	private ResourcePatternResolver resourcePatternResolver = new PathMatchingResourcePatternResolver();
 
-	private final List<TypeFilter> includeFilters = new LinkedList<TypeFilter>();
+	private final List<TypeFilter> includeFilters = new LinkedList<>();
 
-	private final List<TypeFilter> excludeFilters = new LinkedList<TypeFilter>();
+	private final List<TypeFilter> excludeFilters = new LinkedList<>();
 
 	private MetadataReaderFactory metadataReaderFactory = new CachingMetadataReaderFactory(
 			this.resourcePatternResolver);
@@ -202,7 +202,7 @@ public class ClassScanner {
 				appBasePackage = "org.ironrhino";
 			}
 			String[] arr = appBasePackage.split(",+");
-			Set<String> packages = new TreeSet<String>();
+			Set<String> packages = new TreeSet<>();
 			Collection<Class<?>> componentScans = scanAnnotated(arr, ComponentScan.class);
 			for (Class<?> c : componentScans) {
 				ComponentScan cs = c.getAnnotation(ComponentScan.class);
@@ -211,7 +211,7 @@ public class ClassScanner {
 			packages.addAll(Arrays.asList(arr));
 			return packages.toArray(new String[0]);
 		} else {
-			Set<String> packages = new TreeSet<String>();
+			Set<String> packages = new TreeSet<>();
 			for (Package p : Package.getPackages()) {
 				String name = p.getName();
 				if (isExcludePackage(name))

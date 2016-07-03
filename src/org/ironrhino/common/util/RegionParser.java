@@ -17,7 +17,7 @@ public class RegionParser {
 
 	public static List<Region> parse(InputStream inputStream) throws IOException {
 		BufferedReader br = new BufferedReader(new InputStreamReader(inputStream, "utf-8"));
-		List<String> segments = new ArrayList<String>();
+		List<String> segments = new ArrayList<>();
 		String line;
 		boolean end = false;
 		StringBuilder sb = new StringBuilder();
@@ -46,7 +46,7 @@ public class RegionParser {
 			segments.add(sb.toString().trim());
 
 		br.close();
-		List<Region> regions = new ArrayList<Region>();
+		List<Region> regions = new ArrayList<>();
 		for (int i = 0; i < segments.size(); i++) {
 			Region child = parseSegment(segments.get(i));
 			child.setDisplayOrder(i);
@@ -81,7 +81,7 @@ public class RegionParser {
 		Region region = new Region(city.trim());
 		if (counties != null) {
 			String[] ss = counties.split("\\s");
-			List<String> list = new ArrayList<String>();
+			List<String> list = new ArrayList<>();
 			for (int i = 0; i < ss.length; i++) {
 				String s = ss[i].trim();
 				if (!"".equals(s))

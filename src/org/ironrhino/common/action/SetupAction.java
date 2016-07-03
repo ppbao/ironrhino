@@ -117,7 +117,7 @@ public class SetupAction extends BaseAction {
 
 	public List<SetupParameterImpl> getSetupParameters() throws Exception {
 		if (setupParameters == null) {
-			setupParameters = new ArrayList<SetupParameterImpl>();
+			setupParameters = new ArrayList<>();
 			String[] beanNames = ctx.getBeanDefinitionNames();
 			for (String beanName : beanNames) {
 				if (StringUtils.isAlphanumeric(beanName) && ctx.isSingleton(beanName)) {
@@ -250,7 +250,7 @@ public class SetupAction extends BaseAction {
 
 		private boolean required;
 
-		private Set<String> cssClasses = new ConcurrentSkipListSet<String>();
+		private Set<String> cssClasses = new ConcurrentSkipListSet<>();
 
 		private Map<String, String> dynamicAttributes = new ConcurrentHashMap<String, String>(0);
 

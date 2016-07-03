@@ -44,7 +44,7 @@ public class UserRoleManager {
 			for (String s : arr1) {
 				String[] arr2 = s.split(",");
 				if (arr2.length > 1) {
-					List<String> list = new ArrayList<String>(arr2.length);
+					List<String> list = new ArrayList<>(arr2.length);
 					list.addAll(Arrays.asList(arr2));
 					rolesMutexList.add(list);
 				}
@@ -55,7 +55,7 @@ public class UserRoleManager {
 	public Set<String> getStaticRoles(boolean excludeBuiltin) {
 		Set<String> roles = getStaticRoles();
 		if (excludeBuiltin) {
-			Set<String> set = new LinkedHashSet<String>();
+			Set<String> set = new LinkedHashSet<>();
 			for (String s : roles)
 				if (!s.startsWith("ROLE_BUILTIN_"))
 					set.add(s);
@@ -66,7 +66,7 @@ public class UserRoleManager {
 
 	public Set<String> getStaticRoles() {
 		if (staticRoles == null) {
-			Set<String> temp = new LinkedHashSet<String>();
+			Set<String> temp = new LinkedHashSet<>();
 			Collection<Class<?>> set = ClassScanner.scanAssignable(ClassScanner.getAppPackages(), UserRole.class);
 			for (Class<?> c : set) {
 				if (Enum.class.isAssignableFrom(c)) {
@@ -113,7 +113,7 @@ public class UserRoleManager {
 		if (roles == null)
 			return Collections.emptyList();
 		Map<String, String> rolesMap = getAllRoles(false);
-		List<String> result = new ArrayList<String>(roles.size());
+		List<String> result = new ArrayList<>(roles.size());
 		for (String s : roles) {
 			String name = rolesMap.get(s);
 			result.add(StringUtils.isNotBlank(name) ? name : s);
@@ -132,7 +132,7 @@ public class UserRoleManager {
 	public void checkMutex(Collection<String> roles) {
 		if (roles != null && roles.size() > 0 && rolesMutexList.size() > 0) {
 			for (List<String> group : rolesMutexList) {
-				List<String> includes = new ArrayList<String>();
+				List<String> includes = new ArrayList<>();
 				for (String role : roles)
 					if (group.contains(role))
 						includes.add(role);

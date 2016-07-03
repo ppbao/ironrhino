@@ -132,7 +132,7 @@ public class LocalFileStorage implements FileStorage {
 	@Override
 	public List<String> listFiles(String path) {
 		path = Files.simplifyPath(path);
-		final List<String> list = new ArrayList<String>();
+		final List<String> list = new ArrayList<>();
 		new File(directory, path).listFiles(new FileFilter() {
 			@Override
 			public boolean accept(File f) {

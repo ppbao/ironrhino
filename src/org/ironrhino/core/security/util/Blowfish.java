@@ -135,7 +135,7 @@ public class Blowfish {
 		Blowfish instance;
 		if (instanceRef == null || (instance = instanceRef.get()) == null) {
 			instance = new Blowfish();
-			instanceRef = new SoftReference<Blowfish>(instance);
+			instanceRef = new SoftReference<>(instance);
 			pool.set(instanceRef);
 		}
 		return instance;

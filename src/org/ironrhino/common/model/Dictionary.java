@@ -151,8 +151,8 @@ public class Dictionary extends BaseEntity {
 	@PreUpdate
 	public void validate() {
 		if (items != null && items.size() > 0) {
-			Set<String> values = new HashSet<String>(items.size());
-			Set<String> labels = new HashSet<String>(items.size());
+			Set<String> values = new HashSet<>(items.size());
+			Set<String> labels = new HashSet<>(items.size());
 			for (int i = 0; i < items.size(); i++) {
 				LabelValue lv = items.get(i);
 				if (StringUtils.isNotBlank(lv.getValue())) {

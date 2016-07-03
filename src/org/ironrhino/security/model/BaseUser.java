@@ -106,7 +106,7 @@ public class BaseUser extends BaseEntity implements RoledUserDetails, Recordable
 	@Column(length = 4000)
 	@Convert(converter = StringSetConverter.class)
 	@UiConfig(displayOrder = 100, alias = "role", template = "<#list value as r>${statics['org.ironrhino.core.util.ApplicationContextUtils'].getBean('userRoleManager').displayRole(r)}<#if r_has_next> </#if></#list>", csvTemplate = "<#list value as r>${statics['org.ironrhino.core.util.ApplicationContextUtils'].getBean('userRoleManager').displayRole(r)}<#if r_has_next>,</#if></#list>")
-	private Set<String> roles = new LinkedHashSet<String>(0);
+	private Set<String> roles = new LinkedHashSet<>(0);
 
 	@NotInCopy
 	@JsonIgnore

@@ -151,7 +151,7 @@ public class RC4 {
 		RC4 instance;
 		if (instanceRef == null || (instance = instanceRef.get()) == null) {
 			instance = new RC4();
-			instanceRef = new SoftReference<RC4>(instance);
+			instanceRef = new SoftReference<>(instance);
 			pool.set(instanceRef);
 		}
 		return instance;

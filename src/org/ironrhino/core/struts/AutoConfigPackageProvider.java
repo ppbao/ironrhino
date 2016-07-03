@@ -63,7 +63,7 @@ public class AutoConfigPackageProvider implements PackageProvider {
 
 	protected Map<String, Set<String>> configPackages() {
 		Map<String, Set<String>> packages = new HashMap<String, Set<String>>();
-		Set<String> packagePrefixes = new HashSet<String>();
+		Set<String> packagePrefixes = new HashSet<>();
 		for (String pck : ClassScanner.getAppPackages()) {
 			int i = pck.indexOf('.');
 			packagePrefixes.add(i > 0 ? pck.substring(0, i) : pck);
@@ -82,7 +82,7 @@ public class AutoConfigPackageProvider implements PackageProvider {
 					defaultNamespace = "/" + packageName.substring(packageName.lastIndexOf('.') + 1);
 				Set<String> set = packages.get(ac.namespace());
 				if (set == null) {
-					set = new HashSet<String>();
+					set = new HashSet<>();
 					packages.put(defaultNamespace, set);
 				}
 
@@ -104,7 +104,7 @@ public class AutoConfigPackageProvider implements PackageProvider {
 				}
 				Set<String> set = packages.get(defaultNamespace);
 				if (set == null) {
-					set = new HashSet<String>();
+					set = new HashSet<>();
 					packages.put(defaultNamespace, set);
 				}
 				for (String p : packs.split("\\s*,\\s*")) {
