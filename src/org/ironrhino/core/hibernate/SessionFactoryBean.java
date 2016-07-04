@@ -21,20 +21,20 @@ import org.hibernate.id.factory.IdentifierGeneratorFactory;
 import org.ironrhino.core.hibernate.dialect.MyDialectResolver;
 import org.ironrhino.core.util.ClassScanner;
 import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.orm.hibernate4.LocalSessionFactoryBuilder;
 
 public class SessionFactoryBean extends org.springframework.orm.hibernate4.LocalSessionFactoryBean {
 
-	private Logger logger = LoggerFactory.getLogger(getClass());
+	@Autowired
+	private Logger logger;
+
+	@Autowired(required = false)
+	private IdentifierGeneratorFactory identifierGeneratorFactory;
 
 	private Class<?>[] annotatedClasses;
 
 	private String excludeFilter;
-
-	@Autowired(required = false)
-	private IdentifierGeneratorFactory identifierGeneratorFactory;
 
 	public void setExcludeFilter(String excludeFilter) {
 		this.excludeFilter = excludeFilter;

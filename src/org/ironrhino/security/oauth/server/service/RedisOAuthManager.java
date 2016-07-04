@@ -17,7 +17,6 @@ import org.ironrhino.security.oauth.server.enums.ResponseType;
 import org.ironrhino.security.oauth.server.model.Authorization;
 import org.ironrhino.security.oauth.server.model.Client;
 import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.data.redis.core.RedisTemplate;
@@ -25,7 +24,8 @@ import org.springframework.security.core.userdetails.UserDetails;
 
 public class RedisOAuthManager extends AbstractOAuthManager {
 
-	private Logger logger = LoggerFactory.getLogger(getClass());
+	@Autowired
+	private Logger logger;
 
 	private RedisTemplate<String, Client> clientRedisTemplate;
 
