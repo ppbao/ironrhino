@@ -11,6 +11,7 @@ import org.ironrhino.core.metadata.Captcha;
 import org.ironrhino.core.security.captcha.CaptchaManager;
 import org.ironrhino.core.util.AuthzUtils;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
 
 @Component("captchaManager")
@@ -29,6 +30,9 @@ public class DefaultCaptchaManager implements CaptchaManager {
 	public static final int CACHE_ANSWER_TIME_TO_LIVE = 60;
 
 	public static final int CACHE_THRESHOLD_TIME_TO_LIVE = 3600;
+
+	@Value("${captchaManager.bypass:false}")
+	private boolean bypass;
 
 	@Autowired
 	protected CacheManager cacheManager;
@@ -80,6 +84,8 @@ public class DefaultCaptchaManager implements CaptchaManager {
 
 	@Override
 	public void addCaptachaThreshold(HttpServletRequest request) {
+		if (bypass)
+			return;
 		boolean added = request.getAttribute(REQUEST_ATTRIBUTE_KEY_CAPTACHA_THRESHOLD_ADDED) != null;
 		if (!added) {
 			String key = getThresholdKey(request);
@@ -96,6 +102,8 @@ public class DefaultCaptchaManager implements CaptchaManager {
 
 	@Override
 	public boolean[] isCaptchaRequired(HttpServletRequest request, Captcha captcha) {
+		if (bypass)
+			return new boolean[] { false, false };
 		boolean[] required = (boolean[]) request.getAttribute(REQUEST_ATTRIBUTE_KEY_CAPTACHA_REQUIRED);
 		if (required == null) {
 			if (captcha != null) {
