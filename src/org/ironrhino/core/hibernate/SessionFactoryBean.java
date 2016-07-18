@@ -16,6 +16,7 @@ import javax.persistence.Converter;
 import javax.persistence.Entity;
 
 import org.apache.commons.lang3.StringUtils;
+import org.hibernate.MultiTenancyStrategy;
 import org.hibernate.SessionFactory;
 import org.hibernate.cfg.AvailableSettings;
 import org.hibernate.cfg.Configuration;
@@ -106,10 +107,13 @@ public class SessionFactoryBean extends org.springframework.orm.hibernate4.Local
 		for (Class<?> clz : annotatedClasses)
 			logger.info(clz.getName());
 		super.setAnnotatedClasses(annotatedClasses);
-		if (multiTenantConnectionProvider != null)
+		if (multiTenantConnectionProvider != null) {
+			getHibernateProperties().put(AvailableSettings.MULTI_TENANT, MultiTenancyStrategy.SCHEMA);
 			setMultiTenantConnectionProvider(multiTenantConnectionProvider);
-		if (currentTenantIdentifierResolver != null)
-			setCurrentTenantIdentifierResolver(currentTenantIdentifierResolver);
+			if (currentTenantIdentifierResolver != null) {
+				setCurrentTenantIdentifierResolver(currentTenantIdentifierResolver);
+			}
+		}
 		super.afterPropertiesSet();
 	}
 
@@ -145,4 +149,11 @@ public class SessionFactoryBean extends org.springframework.orm.hibernate4.Local
 		}
 		return sfb.buildSessionFactory();
 	}
+
+	public void setCurrentTenantIdentifierResolver(CurrentTenantIdentifierResolver currentTenantIdentifierResolver) {
+		getHibernateProperties().put(AvailableSettings.MULTI_TENANT_IDENTIFIER_RESOLVER,
+				currentTenantIdentifierResolver);
+		super.setCurrentTenantIdentifierResolver(currentTenantIdentifierResolver);
+	}
+
 }
