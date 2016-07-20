@@ -347,12 +347,7 @@ public class EntityAction<EN extends Persistable<?>> extends BaseAction {
 
 	@Override
 	public String execute() throws Exception {
-		BeanWrapperImpl bw;
-		try {
-			bw = new BeanWrapperImpl(getEntityClass().newInstance());
-		} catch (Exception e1) {
-			throw new RuntimeException(e1);
-		}
+		BeanWrapperImpl bw = new BeanWrapperImpl(getEntityClass().newInstance());
 		bw.setConversionService(conversionService);
 		Richtable richtableConfig = getClass().getAnnotation(Richtable.class);
 		if (richtableConfig == null)
@@ -444,14 +439,9 @@ public class EntityAction<EN extends Persistable<?>> extends BaseAction {
 		return LIST;
 	}
 
-	protected DetachedCriteria detachedCriteria() {
+	protected DetachedCriteria detachedCriteria() throws Exception {
 		BaseManager entityManager = getEntityManager(getEntityClass());
-		BeanWrapperImpl bw;
-		try {
-			bw = new BeanWrapperImpl(getEntityClass().newInstance());
-		} catch (Exception e1) {
-			throw new RuntimeException(e1);
-		}
+		BeanWrapperImpl bw = new BeanWrapperImpl(getEntityClass().newInstance());
 		Richtable richtableConfig = getClass().getAnnotation(Richtable.class);
 		if (richtableConfig == null)
 			richtableConfig = getEntityClass().getAnnotation(Richtable.class);
@@ -597,7 +587,7 @@ public class EntityAction<EN extends Persistable<?>> extends BaseAction {
 		return doInput();
 	}
 
-	protected String doInput() {
+	protected String doInput() throws Exception {
 		tryFindEntity();
 		if (_entity != null && !_entity.isNew()) {
 			Tuple<Owner, Class<?>> ownerProperty = getOwnerProperty();
@@ -618,11 +608,7 @@ public class EntityAction<EN extends Persistable<?>> extends BaseAction {
 			}
 		}
 		if (_entity == null)
-			try {
-				_entity = getEntityClass().newInstance();
-			} catch (Exception e) {
-				logger.error(e.getMessage(), e);
-			}
+			_entity = getEntityClass().newInstance();
 		BeanWrapperImpl bw = new BeanWrapperImpl(_entity);
 		bw.setConversionService(conversionService);
 		if (_entity != null && _entity.isNew()) {
@@ -697,7 +683,7 @@ public class EntityAction<EN extends Persistable<?>> extends BaseAction {
 		return doSave();
 	}
 
-	protected String doSave() {
+	protected String doSave() throws Exception {
 		if (!makeEntityValid())
 			return INPUT;
 		BeanWrapperImpl bwp = new BeanWrapperImpl(_entity);
@@ -1113,19 +1099,14 @@ public class EntityAction<EN extends Persistable<?>> extends BaseAction {
 
 	}
 
-	private boolean checkEntityReadonly(String expression, Persistable<?> entity) {
+	private boolean checkEntityReadonly(String expression, Persistable<?> entity) throws Exception {
 		if (StringUtils.isNotBlank(expression)) {
-			try {
-				Template template = new Template(null, "${(" + expression + ")?string!}",
-						freemarkerManager.getConfig());
-				StringWriter sw = new StringWriter();
-				Map<String, Object> rootMap = new HashMap<>(2, 1);
-				rootMap.put("entity", entity);
-				template.process(rootMap, sw);
-				return sw.toString().equals("true");
-			} catch (Exception e) {
-				e.printStackTrace();
-			}
+			Template template = new Template(null, "${(" + expression + ")?string!}", freemarkerManager.getConfig());
+			StringWriter sw = new StringWriter();
+			Map<String, Object> rootMap = new HashMap<>(2, 1);
+			rootMap.put("entity", entity);
+			template.process(rootMap, sw);
+			return sw.toString().equals("true");
 		}
 		return false;
 	}
@@ -1244,7 +1225,7 @@ public class EntityAction<EN extends Persistable<?>> extends BaseAction {
 		return doDelete();
 	}
 
-	protected String doDelete() {
+	protected String doDelete() throws Exception {
 		BaseManager<Persistable<?>> entityManager = getEntityManager(getEntityClass());
 		String[] arr = getId();
 		Serializable[] id = (arr != null) ? new Serializable[arr.length] : new Serializable[0];
@@ -1440,7 +1421,7 @@ public class EntityAction<EN extends Persistable<?>> extends BaseAction {
 		return updateEnabled(false);
 	}
 
-	protected String updateEnabled(boolean enabled) {
+	protected String updateEnabled(boolean enabled) throws Exception {
 		BaseManager<Persistable<?>> em = getEntityManager(getEntityClass());
 		String[] arr = getId();
 		Serializable[] id = (arr != null) ? new Serializable[arr.length] : new Serializable[0];
