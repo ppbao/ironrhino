@@ -41,7 +41,7 @@ public class SettingControl {
 	@Autowired
 	private EntityManager<Setting> entityManager;
 
-	private Map<String, Setting> settings;
+	private volatile Map<String, Setting> settings;
 
 	@PostConstruct
 	public void afterPropertiesSet() {
