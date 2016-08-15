@@ -21,6 +21,7 @@ import org.hibernate.MultiTenancyStrategy;
 import org.hibernate.SessionFactory;
 import org.hibernate.cfg.AvailableSettings;
 import org.hibernate.cfg.Configuration;
+import org.hibernate.cfg.naming.NamingStrategyDelegator;
 import org.hibernate.context.spi.CurrentTenantIdentifierResolver;
 import org.hibernate.engine.jdbc.connections.spi.MultiTenantConnectionProvider;
 import org.hibernate.event.service.spi.EventListenerRegistry;
@@ -48,6 +49,9 @@ public class SessionFactoryBean extends org.springframework.orm.hibernate4.Local
 
 	@Autowired(required = false)
 	private List<AttributeConverter<?, ?>> attributeConverters;
+
+	@Autowired(required = false)
+	private NamingStrategyDelegator namingStrategyDelegator;
 
 	@Autowired(required = false)
 	private MultiTenantConnectionProvider multiTenantConnectionProvider;
@@ -168,6 +172,8 @@ public class SessionFactoryBean extends org.springframework.orm.hibernate4.Local
 				logger.info(ac.getClass().getName());
 			}
 		}
+		if (namingStrategyDelegator != null)
+			sfb.setNamingStrategyDelegator(namingStrategyDelegator);
 		SessionFactory sessionFactory = sfb.buildSessionFactory();
 		if (postInsertEventListeners != null || postUpdateEventListeners != null || postDeleteEventListeners != null) {
 			SessionFactoryImpl sf = (SessionFactoryImpl) sessionFactory;
