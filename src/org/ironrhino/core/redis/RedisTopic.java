@@ -7,10 +7,10 @@ import java.util.concurrent.ExecutorService;
 import javax.annotation.PostConstruct;
 
 import org.ironrhino.core.metadata.Scope;
+import org.ironrhino.core.spring.configuration.PrioritizedQualifier;
 import org.ironrhino.core.util.AppInfo;
 import org.ironrhino.core.util.ReflectionUtils;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.data.redis.connection.Message;
 import org.springframework.data.redis.connection.MessageListener;
 import org.springframework.data.redis.core.RedisTemplate;
@@ -24,18 +24,12 @@ public abstract class RedisTopic<T extends Serializable> implements org.ironrhin
 
 	protected String channelName;
 
-	@Autowired(required = false)
-	@Qualifier("mqRedisTemplate")
-	private RedisTemplate mqRedisTemplate;
-
 	@Autowired
+	@PrioritizedQualifier("mqRedisTemplate")
 	private RedisTemplate redisTemplate;
 
-	@Autowired(required = false)
-	@Qualifier("mqMessageListenerContainer")
-	private RedisMessageListenerContainer mqMessageListenerContainer;
-
 	@Autowired
+	@PrioritizedQualifier("mqMessageListenerContainer")
 	private RedisMessageListenerContainer messageListenerContainer;
 
 	@Autowired(required = false)
@@ -57,10 +51,6 @@ public abstract class RedisTopic<T extends Serializable> implements org.ironrhin
 	@PostConstruct
 	@SuppressWarnings("unchecked")
 	public void afterPropertiesSet() {
-		if (mqRedisTemplate != null)
-			redisTemplate = mqRedisTemplate;
-		if (mqMessageListenerContainer != null)
-			messageListenerContainer = mqMessageListenerContainer;
 		Topic globalTopic = new ChannelTopic(getChannelName(Scope.GLOBAL));
 		Topic applicationTopic = new ChannelTopic(getChannelName(Scope.APPLICATION));
 		messageListenerContainer.addMessageListener(new MessageListener() {
