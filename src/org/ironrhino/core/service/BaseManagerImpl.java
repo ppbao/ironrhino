@@ -61,7 +61,7 @@ import org.springframework.orm.hibernate4.HibernateCallback;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.transaction.annotation.Transactional;
 
-@SuppressWarnings({ "unchecked", "rawtypes" })
+@SuppressWarnings({ "deprecation", "unchecked", "rawtypes" })
 public abstract class BaseManagerImpl<T extends Persistable<?>> implements BaseManager<T> {
 
 	protected Logger logger = LoggerFactory.getLogger(getClass());

@@ -10,12 +10,10 @@ import org.springframework.security.core.userdetails.UserDetails;
 
 public class CreationUserGeneration implements AnnotationValueGeneration<CreationUser> {
 
-	private static final long serialVersionUID = -4668805161430584880L;
-
 	private ValueGenerator<?> generator;
 
 	@Override
-	public void initialize(CreationUser annotation, Class<?> propertyType) {
+	public void initialize(CreationUser annotation, final Class<?> propertyType) {
 		if (UserDetails.class.isAssignableFrom(propertyType)) {
 			generator = new ValueGenerator<UserDetails>() {
 				@SuppressWarnings("unchecked")

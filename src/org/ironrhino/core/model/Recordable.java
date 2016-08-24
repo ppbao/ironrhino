@@ -4,6 +4,7 @@ import java.util.Date;
 
 import org.springframework.security.core.userdetails.UserDetails;
 
+@Deprecated
 public interface Recordable<T extends UserDetails> {
 
 	public Date getModifyDate();
