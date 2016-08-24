@@ -34,6 +34,8 @@ public enum CriterionOperator implements Displayable {
 		@Override
 		public Criterion operator(String name, Object... values) {
 			Object value = values[0];
+			if (value == null)
+				return null;
 			if (value instanceof Date && DateUtils.isBeginOfDay((Date) value))
 				return Restrictions.between(name, value, DateUtils.endOfDay((Date) value));
 			else
@@ -54,6 +56,8 @@ public enum CriterionOperator implements Displayable {
 		@Override
 		public Criterion operator(String name, Object... values) {
 			Object value = values[0];
+			if (value == null)
+				return null;
 			if (value instanceof Date && DateUtils.isBeginOfDay((Date) value))
 				return Restrictions.or(Restrictions.isNull(name), Restrictions.or(Restrictions.lt(name, value),
 						Restrictions.gt(name, DateUtils.endOfDay((Date) value))));
