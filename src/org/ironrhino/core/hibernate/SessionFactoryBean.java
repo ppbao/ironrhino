@@ -16,6 +16,7 @@ import javax.persistence.Converter;
 import javax.persistence.Entity;
 
 import org.apache.commons.lang3.StringUtils;
+import org.hibernate.ConnectionReleaseMode;
 import org.hibernate.Interceptor;
 import org.hibernate.MultiTenancyStrategy;
 import org.hibernate.SessionFactory;
@@ -38,6 +39,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.core.annotation.AnnotationUtils;
 import org.springframework.orm.hibernate4.LocalSessionFactoryBuilder;
 import org.springframework.stereotype.Component;
+import org.springframework.util.ClassUtils;
 
 public class SessionFactoryBean extends org.springframework.orm.hibernate4.LocalSessionFactoryBean {
 
@@ -89,8 +91,13 @@ public class SessionFactoryBean extends org.springframework.orm.hibernate4.Local
 		Properties properties = getHibernateProperties();
 		if (StringUtils.isBlank(properties.getProperty(AvailableSettings.DIALECT_RESOLVERS)))
 			properties.put(AvailableSettings.DIALECT_RESOLVERS, MyDialectResolver.class.getName());
-		Map<String, Class<?>> added = new HashMap<String, Class<?>>();
-		List<Class<?>> classes = new ArrayList<Class<?>>();
+		if (StringUtils.isBlank(properties.getProperty(AvailableSettings.RELEASE_CONNECTIONS))
+				&& ClassUtils.isPresent("org.springframework.batch.core.Job", getClass().getClassLoader())) {
+			// spring-batch need custom isolation levels
+			properties.put(AvailableSettings.RELEASE_CONNECTIONS, ConnectionReleaseMode.ON_CLOSE.name());
+		}
+		Map<String, Class<?>> added = new HashMap<>();
+		List<Class<?>> classes = new ArrayList<>();
 		Collection<Class<?>> scaned = ClassScanner.scanAnnotated(ClassScanner.getAppPackages(), Entity.class);
 		if (annotatedClasses != null)
 			for (Class<?> c : annotatedClasses)
