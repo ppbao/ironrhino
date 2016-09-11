@@ -1,5 +1,6 @@
+<#ftl output_format='HTML'>
 <!DOCTYPE html>
-<#escape x as x?html><html>
+<html>
 <head>
 <title>${action.getText('apply')}${action.getText('client')}</title>
 </head>
@@ -8,4 +9,4 @@
 	<p>client_secret:<span style="margin-left:5px;font-weight:bold;">${client.secret}</span></p>
 	<p>${action.getText('description')}:<span style="margin-left:5px;font-weight:bold;">${client.description}</span></p>
 </body>
-</html></#escape>
+</html>
