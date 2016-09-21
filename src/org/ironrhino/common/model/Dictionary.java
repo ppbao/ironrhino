@@ -61,7 +61,7 @@ public class Dictionary extends BaseEntity {
 	@Column(length = 4000)
 	@Convert(converter = LabelValueListConverter.class)
 	@SearchableComponent
-	@UiConfig(hiddenInList = @Hidden(true))
+	@UiConfig(hiddenInList = @Hidden(true), excludedFromCriteria = true)
 	private List<LabelValue> items = new ArrayList<>();
 
 	@Version

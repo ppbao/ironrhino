@@ -60,7 +60,7 @@ public class Schema extends BaseEntity {
 	@Column(length = 4000)
 	@Convert(converter = FieldsConverter.class)
 	@SearchableComponent
-	@UiConfig(hiddenInList = @Hidden(true))
+	@UiConfig(hiddenInList = @Hidden(true), excludedFromCriteria = true)
 	private List<SchemaField> fields = new ArrayList<>();
 
 	@Version
